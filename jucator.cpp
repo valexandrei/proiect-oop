@@ -29,13 +29,20 @@ void Jucator::afisare() const {
 
 void Jucator::adaugaXP(int xp) {
     xpCurent += xp;
-    while(xpCurent >= xpNecesar) crescInNivel();
+    while(xpCurent >= xpNecesar) {
+        crescInNivel();
+    }
 }
 
 void Jucator::crescInNivel() {
     nivel++;
     xpCurent -= xpNecesar;
-    xpNecesar *= 1.2;
+    xpNecesar = static_cast<int>(xpNecesar * 1.2);
     hpMax += 20;
     hp = hpMax;
+}
+
+std::ostream& operator<<(std::ostream& os, const Jucator& j) {
+    os << static_cast<const Entitate&>(j) << " | Nivel:" << j.nivel << " | " << j.attr;
+    return os;
 }

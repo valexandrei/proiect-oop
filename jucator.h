@@ -1,7 +1,6 @@
 #ifndef JUCATOR_H
 #define JUCATOR_H
 #include "entitate.h"
-#include "exceptii.h"
 #include <string>
 #include <iostream>
 
@@ -34,9 +33,6 @@ public:
     int getXP() const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
 
-    friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
-        os << "Jucator - Nivel: " << j.nivel << " | " << j.attr;
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const Jucator& j);
 };
 #endif
