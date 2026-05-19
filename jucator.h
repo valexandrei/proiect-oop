@@ -33,7 +33,6 @@ public:
     int getXP() const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
 
-    // FARA static_cast la Entitate. Printam direct proprietatile esentiale!
     friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
         os << "Jucator: " << j.getNume() << " | Nivel:" << j.nivel << " | " << j.attr;
         return os;

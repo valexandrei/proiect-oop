@@ -7,7 +7,7 @@ private:
     int x, y;
 
 public:
-    Pozitie(int _x = 0, int _y = 0);
+    explicit Pozitie(int _x = 0, int _y = 0);
     int getX() const;
     int getY() const;
 
