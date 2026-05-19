@@ -18,7 +18,6 @@ class Jucator : public Entitate {
 private:
     Atribute attr;
     int nivel, xpCurent, xpNecesar;
-    int* logBuffer;
 
 public:
     Jucator(const std::string& n, const Pozitie& p);

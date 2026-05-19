@@ -2,16 +2,11 @@
 #include <iostream>
 
 Jucator::Jucator(const std::string& n, const Pozitie& p)
-    : Entitate(n, p, 100, 15, 5), nivel(1), xpCurent(0), xpNecesar(100) {
-    logBuffer = new int[5]{0,0,0,0,0};
-}
+    : Entitate(n, p, 100, 15, 5), nivel(1), xpCurent(0), xpNecesar(100) {}
 
 Jucator::Jucator(const Jucator& other)
     : Entitate(other), attr(other.attr), nivel(other.nivel),
-      xpCurent(other.xpCurent), xpNecesar(other.xpNecesar) {
-    logBuffer = new int[5];
-    for(int i = 0; i < 5; ++i) logBuffer[i] = other.logBuffer[i];
-}
+      xpCurent(other.xpCurent), xpNecesar(other.xpNecesar) {}
 
 Jucator& Jucator::operator=(const Jucator& other) {
     if(this != &other) {
@@ -20,16 +15,11 @@ Jucator& Jucator::operator=(const Jucator& other) {
         nivel = other.nivel;
         xpCurent = other.xpCurent;
         xpNecesar = other.xpNecesar;
-        delete[] logBuffer;
-        logBuffer = new int[5];
-        for(int i = 0; i < 5; ++i) logBuffer[i] = other.logBuffer[i];
     }
     return *this;
 }
 
-Jucator::~Jucator() {
-    delete[] logBuffer;
-}
+Jucator::~Jucator() {}
 
 void Jucator::actioneaza() {}
 
