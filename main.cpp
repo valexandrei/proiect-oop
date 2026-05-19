@@ -10,6 +10,7 @@
 #include "exceptii.h"
 #include "inventar.h"
 #include "pistoale.h"
+#include "celula.h"
 
 int main() {
     try {
@@ -74,11 +75,16 @@ int main() {
         }
 
         Inventar rucsac;
-        Pistoale* armaGăsită = new Pistoale();
-        armaGăsită->reincarca();
-        if(rucsac.adaugaObiect(armaGăsită)) {
+        Pistoale* armaGasita = new Pistoale();
+        armaGasita->reincarca();
+        if(rucsac.adaugaObiect(armaGasita)) {
             rucsac.afiseazaTot();
             rucsac.folosesteToate();
+        }
+
+        Celula c(Pozitie(0,0), '#');
+        if (c.eWorldWall()) {
+            c.spargeZid();
         }
 
         joc.verificaInteractiune(erou, inamici);

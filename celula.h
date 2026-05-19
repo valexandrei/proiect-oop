@@ -9,7 +9,7 @@ private:
     char tip;
 
 public:
-    Celula(Pozitie _p = Pozitie(), char _tip = '.');
+    explicit Celula(Pozitie _p = Pozitie(), char _tip = '.');
 
     void spargeZid();
     bool eWorldWall() const;
