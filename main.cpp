@@ -8,6 +8,8 @@
 #include "gamedata.h"
 #include "battlelog.h"
 #include "exceptii.h"
+#include "inventar.h"
+#include "pistoale.h"
 
 int main() {
     try {
@@ -21,13 +23,18 @@ int main() {
         }
 
         std::cout << GameData::getPovesteFundal() << "\n";
+        std::cout << GameData::getMesajLevelUp(2) << "\n";
 
         Jucator erou(numeCitit, Pozitie(1, 1));
         Jucator copieErou = erou;
         Jucator p3("Test", Pozitie(0,0));
         p3 = erou;
 
+        erou.setPozitie(Pozitie(1, 2));
         erou.adaugaXP(150);
+
+        std::cout << "Nivel: " << erou.getNivel() << " | XP: " << erou.getXP()
+                  << " / " << erou.getXPNecesar() << " | HP: " << erou.getHP() << "\n";
 
         JocDungeon joc("Dungeon of Doom", dimL, dimC);
         joc.initSesiune();
@@ -36,6 +43,7 @@ int main() {
         std::cout << "--- STATUS INITIAL JUCATOR ---\n";
         std::cout << erou << "\n";
         std::cout << "Linii labirint: " << lab.getLinii() << " | Coloane: " << lab.getColoane() << "\n";
+        lab.afisareGrafica(erou.getPozitie(), std::vector<Inamic*>());
 
         std::vector<Inamic*> inamici;
         Inamic* boss = new Inamic("Seful Goblins", Pozitie(2, 2), 50);
@@ -63,6 +71,14 @@ int main() {
         std::vector<std::string> tipuri = GameData::getTipuriInamici();
         for(const auto& t : tipuri) {
             std::cout << "Inamic potential: " << GameData::getDescriereInamic(t) << "\n";
+        }
+
+        Inventar rucsac;
+        Pistoale* armaGăsită = new Pistoale();
+        armaGăsită->reincarca();
+        if(rucsac.adaugaObiect(armaGăsită)) {
+            rucsac.afiseazaTot();
+            rucsac.folosesteToate();
         }
 
         joc.verificaInteractiune(erou, inamici);
