@@ -85,6 +85,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         battlelog.h
         radar.cpp
         radar.h
+        exceptii.h
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE

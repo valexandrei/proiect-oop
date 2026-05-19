@@ -1,41 +1,41 @@
-#include "jucator.h"
-#include <iostream>
+#ifndef JUCATOR_H
+#define JUCATOR_H
+#include "entitate.h"
+#include "exceptii.h"
 #include <string>
+#include <iostream>
 
-Jucator::Jucator(const std::string& n, Pozitie p)
-    : Entitate(n, p, 100, 15, 5), nivel(1), xpCurent(0), xpNecesar(100) {}
-
-void Jucator::actioneaza() {
-    std::cout << "Jucatorul " << nume << " exploreaza nivelul " << nivel << ".\n";
-}
-
-void Jucator::adaugaXP(int xp) {
-    xpCurent += xp;
-    while (xpCurent >= xpNecesar) {
-        crescInNivel();
+class Atribute {
+public:
+    int str = 10, dex = 10;
+    friend std::ostream& operator<<(std::ostream& os, const Atribute& a) {
+        os << "STR:" << a.str << " DEX:" << a.dex;
+        return os;
     }
-}
+};
 
-void Jucator::crescInNivel() {
-    xpCurent -= xpNecesar;
-    nivel++;
+class Jucator : public Entitate {
+private:
+    Atribute attr;
+    int nivel, xpCurent, xpNecesar;
+    int* logBuffer;
 
-    // Logica mai densa pentru a creste procentajul de C++
-    int vechiulXP = xpNecesar;
-    xpNecesar = static_cast<int>(vechiulXP * 1.25) + (nivel * 10);
+public:
+    Jucator(const std::string& n, const Pozitie& p);
+    Jucator(const Jucator& other);
+    Jucator& operator=(const Jucator& other);
+    ~Jucator();
 
-    double mult = 1.0 + (nivel * 0.1);
-    hpMax = static_cast<int>(hpMax * mult);
-    hp = hpMax;
-    atac += static_cast<int>(5 * mult);
-    aparare += static_cast<int>(2 * mult);
+    void adaugaXP(int xp);
+    void crescInNivel();
+    int getNivel() const { return nivel; }
+    int getXP() const { return xpCurent; }
+    int getXPNecesar() const { return xpNecesar; }
 
-    std::cout << "LEVEL UP! Nivel actual: " << nivel << " (XP necesar: " << xpNecesar << ")\n";
-}
-
-void Jucator::afisare() const {
-    std::cout << "[Jucator] " << nume
-              << " | Nivel: " << nivel
-              << " | HP: " << hp << "/" << hpMax
-              << " | XP: " << xpCurent << "/" << xpNecesar << "\n";
-}
+    friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
+        os << "Jucator: " << j.getNume() << " | Pozitie: " << j.getPozitie()
+           << " | HP: " << j.getHP() << " | Nivel: " << j.nivel << " | " << j.attr;
+        return os;
+    }
+};
+#endif

@@ -1,26 +1,26 @@
 #ifndef LABIRINT_H
 #define LABIRINT_H
-
 #include <vector>
+#include <iostream>
 #include "celula.h"
-#include "pozitie.h"
-class Inamic;
 
 class Labirint {
-    int linii;
-    int coloane;
-    std::vector<std::vector<Celula>> harta;
-
+private:
+    int linii, coloane;
+    std::vector<std::vector<Celula>> grija;
 public:
-    Labirint(int l, int c);
-    void genereazaLabirint();
-
-    // Folosim pointer sau referinta pentru Inamic ca sa mearga forward declaration
-    void afisareGrafica(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const;
-
+    Labirint(int L = 5, int C = 5);
+    bool estePozitieValida(int x, int y) const;
+    void afisareGrafica(const Pozitie& posJucator, const std::vector<class Inamic*>& inamici) const;
     int getLinii() const { return linii; }
     int getColoane() const { return coloane; }
-    bool estePozitieValida(int x, int y) const;
+    friend std::ostream& operator<<(std::ostream& os, const Labirint& l) {
+        os << "Dungeon " << l.linii << "x" << l.coloane << "\n";
+        for(const auto& rand : l.grija) {
+            for(const auto& cel : rand) os << cel << " ";
+            os << "\n";
+        }
+        return os;
+    }
 };
-
 #endif

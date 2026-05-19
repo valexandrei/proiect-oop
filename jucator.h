@@ -1,22 +1,40 @@
 #ifndef JUCATOR_H
 #define JUCATOR_H
-
 #include "entitate.h"
+#include <string>
+#include <iostream>
+
+class Atribute {
+public:
+    int str = 10, dex = 10;
+    friend std::ostream& operator<<(std::ostream& os, const Atribute& a) {
+        os << "STR:" << a.str << " DEX:" << a.dex;
+        return os;
+    }
+};
 
 class Jucator : public Entitate {
-    int nivel;
-    int xpCurent;
-    int xpNecesar;
+private:
+    Atribute attr;
+    int nivel, xpCurent, xpNecesar;
+    int* logBuffer;
 
 public:
-    Jucator(const std::string& n, Pozitie p);
-    void actioneaza() override;
+    Jucator(const std::string& n, const Pozitie& p);
+    Jucator(const Jucator& other);
+    Jucator& operator=(const Jucator& other);
+    ~Jucator();
+
     void adaugaXP(int xp);
     void crescInNivel();
-    void afisare() const override;
     int getNivel() const { return nivel; }
     int getXP() const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
-};
 
+    friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
+        os << "Jucator: " << j.getNume() << " | Pozitie: " << j.getPozitie()
+           << " | HP: " << j.getHP() << " | Nivel: " << j.nivel << " | " << j.attr;
+        return os;
+    }
+};
 #endif

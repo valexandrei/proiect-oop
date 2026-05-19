@@ -1,6 +1,5 @@
 #ifndef RADAR_H
 #define RADAR_H
-
 #include <vector>
 #include <string>
 #include "pozitie.h"
@@ -18,5 +17,4 @@ public:
     void afiseazaRadar(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const;
     std::string getDistantaPanaLaCelMaiApropiat(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const;
 };
-
 #endif

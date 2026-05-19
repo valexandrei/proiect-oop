@@ -1,17 +1,17 @@
 #ifndef CELULA_H
 #define CELULA_H
-
 #include "pozitie.h"
 #include <iostream>
 
 class Celula {
-    Pozitie pos;
-    bool esteZid;
+private:
+    Pozitie p;
+    char tip;
 public:
-    explicit Celula(int x = 0, int y = 0, bool zid = true);
-    void spargeZid();
-    bool eWorldWall() const;
-    friend std::ostream& operator<<(std::ostream& os, const Celula& c);
+    Celula(Pozitie _p = Pozitie(), char _tip = '.') : p(_p), tip(_tip) {}
+    friend std::ostream& operator<<(std::ostream& os, const Celula& c) {
+        os << "[Coord:" << c.p << " Tip:" << c.tip << "]";
+        return os;
+    }
 };
-
 #endif
