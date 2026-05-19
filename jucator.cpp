@@ -1,41 +1,51 @@
-#ifndef JUCATOR_H
-#define JUCATOR_H
-#include "entitate.h"
-#include "exceptii.h"
-#include <string>
+#include "jucator.h"
 #include <iostream>
 
-class Atribute {
-public:
-    int str = 10, dex = 10;
-    friend std::ostream& operator<<(std::ostream& os, const Atribute& a) {
-        os << "STR:" << a.str << " DEX:" << a.dex;
-        return os;
+Jucator::Jucator(const std::string& n, const Pozitie& p)
+    : Entitate(n, p, 100, 15, 5), nivel(1), xpCurent(0), xpNecesar(100) {
+    logBuffer = new int[5]{0,0,0,0,0};
+}
+
+Jucator::Jucator(const Jucator& other)
+    : Entitate(other), attr(other.attr), nivel(other.nivel),
+      xpCurent(other.xpCurent), xpNecesar(other.xpNecesar) {
+    logBuffer = new int[5];
+    for(int i = 0; i < 5; ++i) logBuffer[i] = other.logBuffer[i];
+}
+
+Jucator& Jucator::operator=(const Jucator& other) {
+    if(this != &other) {
+        Entitate::operator=(other);
+        attr = other.attr;
+        nivel = other.nivel;
+        xpCurent = other.xpCurent;
+        xpNecesar = other.xpNecesar;
+        delete[] logBuffer;
+        logBuffer = new int[5];
+        for(int i = 0; i < 5; ++i) logBuffer[i] = other.logBuffer[i];
     }
-};
+    return *this;
+}
 
-class Jucator : public Entitate {
-private:
-    Atribute attr;
-    int nivel, xpCurent, xpNecesar;
-    int* logBuffer;
+Jucator::~Jucator() {
+    delete[] logBuffer;
+}
 
-public:
-    Jucator(const std::string& n, const Pozitie& p);
-    Jucator(const Jucator& other);
-    Jucator& operator=(const Jucator& other);
-    ~Jucator();
+void Jucator::actioneaza() {}
 
-    void adaugaXP(int xp);
-    void crescInNivel();
-    int getNivel() const { return nivel; }
-    int getXP() const { return xpCurent; }
-    int getXPNecesar() const { return xpNecesar; }
+void Jucator::afisare() const {
+    std::cout << *this << "\n";
+}
 
-    friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
-        os << "Jucator: " << j.getNume() << " | Pozitie: " << j.getPozitie()
-           << " | HP: " << j.getHP() << " | Nivel: " << j.nivel << " | " << j.attr;
-        return os;
-    }
-};
-#endif
+void Jucator::adaugaXP(int xp) {
+    xpCurent += xp;
+    while(xpCurent >= xpNecesar) crescInNivel();
+}
+
+void Jucator::crescInNivel() {
+    nivel++;
+    xpCurent -= xpNecesar;
+    xpNecesar *= 1.2;
+    hpMax += 20;
+    hp = hpMax;
+}

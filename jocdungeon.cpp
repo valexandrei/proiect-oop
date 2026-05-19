@@ -4,7 +4,7 @@
 JocDungeon::JocDungeon(std::string nume, int l, int c) : numeSesiune(nume), labirint(l, c) {}
 
 void JocDungeon::initSesiune() {
-    labirint.genereazaLabirint();
+    //labirint.genereazaLabirint();
     std::cout << "Sesiunea " << numeSesiune << " a fost initializata.\n";
 }
 

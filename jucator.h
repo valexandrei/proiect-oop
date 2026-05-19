@@ -1,6 +1,7 @@
 #ifndef JUCATOR_H
 #define JUCATOR_H
 #include "entitate.h"
+#include "exceptii.h"
 #include <string>
 #include <iostream>
 
@@ -23,7 +24,10 @@ public:
     Jucator(const std::string& n, const Pozitie& p);
     Jucator(const Jucator& other);
     Jucator& operator=(const Jucator& other);
-    ~Jucator();
+    ~Jucator() override;
+
+    void actioneaza() override;
+    void afisare() const override;
 
     void adaugaXP(int xp);
     void crescInNivel();
@@ -32,8 +36,7 @@ public:
     int getXPNecesar() const { return xpNecesar; }
 
     friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
-        os << "Jucator: " << j.getNume() << " | Pozitie: " << j.getPozitie()
-           << " | HP: " << j.getHP() << " | Nivel: " << j.nivel << " | " << j.attr;
+        os << "Jucator - Nivel: " << j.nivel << " | " << j.attr;
         return os;
     }
 };
