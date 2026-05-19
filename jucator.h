@@ -33,9 +33,9 @@ public:
     int getXP() const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
 
-    // Reparat cu static_cast direct in interiorul clasei ca sa fie vizibil peste tot
+    // FARA static_cast la Entitate. Printam direct proprietatile esentiale!
     friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
-        os << static_cast<const Entitate&>(j) << " | Nivel:" << j.nivel << " | " << j.attr;
+        os << "Jucator: " << j.getNume() << " | Nivel:" << j.nivel << " | " << j.attr;
         return os;
     }
 };
