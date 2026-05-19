@@ -33,6 +33,10 @@ public:
     int getXP() const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
 
-    friend std::ostream& operator<<(std::ostream& os, const Jucator& j);
+    // Reparat cu static_cast direct in interiorul clasei ca sa fie vizibil peste tot
+    friend std::ostream& operator<<(std::ostream& os, const Jucator& j) {
+        os << static_cast<const Entitate&>(j) << " | Nivel:" << j.nivel << " | " << j.attr;
+        return os;
+    }
 };
 #endif

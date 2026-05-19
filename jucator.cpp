@@ -41,8 +41,3 @@ void Jucator::crescInNivel() {
     hpMax += 20;
     hp = hpMax;
 }
-
-std::ostream& operator<<(std::ostream& os, const Jucator& j) {
-    os << static_cast<const Entitate&>(j) << " | Nivel:" << j.nivel << " | " << j.attr;
-    return os;
-}
