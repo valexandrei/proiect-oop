@@ -17,6 +17,11 @@ public:
     virtual void afisare() const;
 
     const std::string& getNume() const { return nume; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Obiect& o) {
+        os << "Obiect: " << o.nume << " (Valoare: " << o.valoare << ")";
+        return os;
+    }
 };
 
 #endif

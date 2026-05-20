@@ -11,6 +11,9 @@
 #include "inventar.h"
 #include "pistoale.h"
 #include "celula.h"
+#include "potiune.h"
+#include "sabie.h"
+#include "spear.h"
 
 int main() {
     try {
@@ -91,7 +94,22 @@ int main() {
 
         for (auto* i : inamici) delete i;
         inamici.clear();
+        std::cout << "\n--- TEST operator<< ---\n";
+        std::cout << erou << "\n";
+        std::cout << *boss << "\n";
+        std::cout << joc << "\n";
+        std::cout << miniMap << "\n";
+        std::cout << rucsac << "\n";
 
+        Sabie sabie;
+        Spear lance;
+        Potiune potion("Potion of Healing", 30, 50);
+        std::cout << sabie << "\n";
+        std::cout << lance << "\n";
+        std::cout << potion << "\n";
+
+        Pistoale pistol;
+        std::cout << pistol << "\n";
     } catch (const std::exception& e) {
         std::cerr << "A aparut o eroare neasteptata: " << e.what() << "\n";
         return 1;

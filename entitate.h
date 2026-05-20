@@ -2,6 +2,7 @@
 #define ENTITATE_H
 
 #include <string>
+#include <iostream>
 #include "pozitie.h"
 
 class Entitate {
@@ -25,6 +26,13 @@ public:
     std::string const& getNume() const { return nume; }
     int getHP() const { return hp; }
     void primesteDamage(int dmg);
+
+    friend std::ostream& operator<<(std::ostream& os, const Entitate& e) {
+        os << "Entitate: " << e.nume
+           << " | HP: " << e.hp << "/" << e.hpMax
+           << " | Pozitie: " << e.pos;
+        return os;
+    }
 };
 
 #endif
