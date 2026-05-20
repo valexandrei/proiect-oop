@@ -91,9 +91,6 @@ int main() {
         }
 
         joc.verificaInteractiune(erou, inamici);
-
-        for (auto* i : inamici) delete i;
-        inamici.clear();
         std::cout << "\n--- TEST operator<< ---\n";
         std::cout << erou << "\n";
         std::cout << *boss << "\n";
@@ -110,6 +107,8 @@ int main() {
 
         Pistoale pistol;
         std::cout << pistol << "\n";
+        for (auto* i : inamici) delete i;
+        inamici.clear();
     } catch (const std::exception& e) {
         std::cerr << "A aparut o eroare neasteptata: " << e.what() << "\n";
         return 1;
