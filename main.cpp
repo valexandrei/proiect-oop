@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "jocdungeon.h"
@@ -13,6 +14,9 @@
 #include "sabie.h"
 #include "spear.h"
 #include "potiune.h"
+#include "battlelog.h"
+#include "gamedata.h"
+#include "radar.h"
 
 static constexpr int TILE_SIZE   = 16;
 static constexpr int SCALE       = 3;
@@ -53,6 +57,7 @@ static TileCoord getTileForEntitate(const Entitate& e) {
     return TC_GOBLIN;
 }
 
+// ── floating damage numbers ───────────────────────────────────────────────────
 struct FloatText {
     sf::Text text;
     sf::Vector2f pos;
@@ -88,7 +93,6 @@ static void updateAndDrawFloats(sf::RenderWindow& window,
         sf::Color oc = ft.text.getOutlineColor();
         oc.a = c.a;
         ft.text.setOutlineColor(oc);
-
         float sx = ft.pos.x * TILE_SCALED - static_cast<float>(camX);
         float sy = ft.pos.y * TILE_SCALED - static_cast<float>(camY) - 10.f;
         ft.text.setPosition(sx, sy);
@@ -98,6 +102,7 @@ static void updateAndDrawFloats(sf::RenderWindow& window,
         [](const FloatText& ft){ return ft.life <= 0.f; }), floats.end());
 }
 
+// ── UI ────────────────────────────────────────────────────────────────────────
 static sf::Color hpColor(float ratio) {
     if (ratio > 0.6f) return sf::Color(40, 200, 40);
     if (ratio > 0.3f) return sf::Color(220, 200, 20);
@@ -136,18 +141,21 @@ static void drawBar(sf::RenderWindow& window,
     window.draw(txt);
 }
 
-static void drawUI(sf::RenderWindow& window, const sf::Font& font, const Jucator& j) {
+static void drawUI(sf::RenderWindow& window, const sf::Font& font,
+                   const Jucator& j, const std::string& radarInfo) {
     constexpr float x    = 14.f;
     constexpr float barW = 240.f;
     constexpr float barH = 22.f;
     float y = 14.f;
 
+    // bara HP
     float hpRatio = static_cast<float>(j.getHP()) / static_cast<float>(j.getHPMax());
     drawBar(window, x, y, barW, barH, hpRatio,
             hpColor(hpRatio), sf::Color(60, 0, 0),
             "HP: " + std::to_string(j.getHP()) + " / " + std::to_string(j.getHPMax()),
             font);
 
+    // bara XP
     y += barH + 8.f;
     float xpRatio = static_cast<float>(j.getXP()) / static_cast<float>(j.getXPNecesar());
     drawBar(window, x, y, barW, barH, xpRatio,
@@ -155,6 +163,7 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font, const Jucator
             "XP: " + std::to_string(j.getXP()) + " / " + std::to_string(j.getXPNecesar()),
             font);
 
+    // nume + nivel
     y += barH + 10.f;
     sf::Text nameText;
     nameText.setFont(font);
@@ -165,6 +174,20 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font, const Jucator
     nameText.setString(j.getNume() + "  Niv." + std::to_string(j.getNivel()));
     nameText.setPosition(x, y);
     window.draw(nameText);
+
+    // radar info (distanta pana la cel mai apropiat inamic)
+    if (!radarInfo.empty()) {
+        y += 22.f;
+        sf::Text radarText;
+        radarText.setFont(font);
+        radarText.setCharacterSize(12);
+        radarText.setFillColor(sf::Color(150, 255, 150));
+        radarText.setOutlineColor(sf::Color::Black);
+        radarText.setOutlineThickness(1.f);
+        radarText.setString(radarInfo);
+        radarText.setPosition(x, y);
+        window.draw(radarText);
+    }
 }
 
 static void drawMessage(sf::RenderWindow& window, const sf::Font& font, const std::string& msg) {
@@ -180,7 +203,32 @@ static void drawMessage(sf::RenderWindow& window, const sf::Font& font, const st
     window.draw(t);
 }
 
+// deseneaza ultimele N linii din BattleLog in coltul din dreapta-jos
+static void drawBattleLog(sf::RenderWindow& window, const sf::Font& font,
+                          const std::vector<std::string>& linii) {
+    constexpr int MAX_LINII = 6;
+    constexpr float charSize = 12.f;
+    constexpr float lineH    = 16.f;
+    float startY = static_cast<float>(SCREEN_H) - 20.f - MAX_LINII * lineH;
 
+    int start = static_cast<int>(linii.size()) - MAX_LINII;
+    if (start < 0) start = 0;
+
+    for (int i = start; i < static_cast<int>(linii.size()); ++i) {
+        sf::Text t;
+        t.setFont(font);
+        t.setCharacterSize(static_cast<unsigned int>(charSize));
+        t.setFillColor(sf::Color(200, 200, 200, 200));
+        t.setOutlineColor(sf::Color::Black);
+        t.setOutlineThickness(1.f);
+        t.setString(linii[i]);
+        float lineY = startY + static_cast<float>(i - start) * lineH;
+        t.setPosition(static_cast<float>(SCREEN_W) - 520.f, lineY);
+        window.draw(t);
+    }
+}
+
+// ── combat ────────────────────────────────────────────────────────────────────
 static bool suntAdiacente(const Pozitie& a, const Pozitie& b) {
     int dr = std::abs(a.getX() - b.getX());
     int dc = std::abs(a.getY() - b.getY());
@@ -189,16 +237,27 @@ static bool suntAdiacente(const Pozitie& a, const Pozitie& b) {
 
 static void procesezaCombatLocal(JocDungeon& joc,
                                   std::vector<FloatText>& floats,
-                                  const sf::Font& font) {
+                                  const sf::Font& font,
+                                  std::vector<std::string>& logLinii,
+                                  int& nivelAnterior) {
     Jucator& jucator = joc.getJucator();
     Pozitie jPos = jucator.getPozitie();
+    bool atacatCeva = false;
 
     for (const auto& e : joc.getEntitati()) {
         if (!e->esteViu()) continue;
         if (!suntAdiacente(jPos, e->getPozitie())) continue;
+        atacatCeva = true;
 
         int dmgDat = jucator.calculeazaDamage();
         e->primesteDamage(dmgDat);
+
+        // BattleLog: inregistreaza evenimentul
+        std::string descriere = BattleLog::genereazaDescriereLupta(
+            jucator.getNume(), e->getNume(), dmgDat);
+        BattleLog::adaugaEveniment(descriere);
+        logLinii.push_back(descriere);
+
         spawnFloatText(floats, font,
                        "-" + std::to_string(dmgDat),
                        static_cast<float>(e->getPozitie().getY()),
@@ -206,6 +265,10 @@ static void procesezaCombatLocal(JocDungeon& joc,
                        sf::Color(255, 80, 80));
 
         if (!e->esteViu()) {
+            std::string evMoarte = e->getNume() + " a fost eliminat!";
+            BattleLog::adaugaEveniment(evMoarte);
+            logLinii.push_back(evMoarte);
+
             if (const Inamic* in = dynamic_cast<const Inamic*>(e.get())) {
                 jucator.adaugaXP(in->getXPReward());
                 spawnFloatText(floats, font,
@@ -213,30 +276,71 @@ static void procesezaCombatLocal(JocDungeon& joc,
                                static_cast<float>(jPos.getY()),
                                static_cast<float>(jPos.getX()),
                                sf::Color(80, 220, 255));
+
+                // GameData: mesaj level up daca jucatorul a urcat nivel
+                int nivelNou = jucator.getNivel();
+                if (nivelNou > nivelAnterior) {
+                    std::string msgLvl = GameData::getMesajLevelUp(nivelNou);
+                    BattleLog::adaugaEveniment(msgLvl);
+                    logLinii.push_back(msgLvl);
+                    nivelAnterior = nivelNou;
+                }
             }
             continue;
         }
 
+        // inamicul loveste inapoi
         int dmgPrimit = e->calculeazaDamage();
         jucator.primesteDamage(dmgPrimit);
+
+        std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
+        BattleLog::adaugaEveniment(evContra);
+        logLinii.push_back(evContra);
+
+        // GameData: descriere inamic afisata la primul contraatac
+        std::string descriereInamic = GameData::getDescriereInamic(e->getNume());
+        if (!descriereInamic.empty()) {
+            logLinii.push_back(descriereInamic);
+        }
+
         spawnFloatText(floats, font,
                        "-" + std::to_string(dmgPrimit),
                        static_cast<float>(jPos.getY()),
                        static_cast<float>(jPos.getX()),
                        sf::Color(255, 60, 60));
     }
-}
 
-int main() {
-    JocDungeon joc("Dungeon of Doom", 20, 30);
-
-    try {
-        joc.initSesiune();
-    } catch (const DungeonException&) {
-        return 1;
+        if (!atacatCeva) {
+        BattleLog::adaugaEveniment(jucator.getNume() + " loveste in gol.");
+        logLinii.push_back(jucator.getNume() + " loveste in gol.");
     }
 
-    Inventar rucsac;
+    // Entitate::afiseaza + Fantoma::esteCorporeala — logate dupa fiecare atac
+    for (const auto& e : joc.getEntitati()) {
+        if (!e->esteViu()) continue;
+        std::ostringstream oss;
+        e->afiseaza(oss);
+        if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
+            BattleLog::adaugaEveniment(oss.str() +
+                (f->esteCorporeala() ? " [corp]" : " [incorp]"));
+        }
+    }
+}
+
+// ── logica non-grafica ────────────────────────────────────────────────────────
+static void initLogica(JocDungeon& joc, Inventar& rucsac) {
+    joc.initSesiune();
+
+    // GameData: afiseaza povestea de fundal la pornire
+    std::cout << GameData::getPovesteFundal() << "\n\n";
+
+    // GameData: afiseaza tipurile de inamici disponibili
+    std::cout << "Inamici in dungeon:\n";
+    for (const auto& tip : GameData::getTipuriInamici()) {
+        std::cout << "  - " << tip << "\n";
+    }
+    std::cout << "\n";
+
     try {
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion of Healing", 30, 50));
         rucsac.adaugaObiect(std::make_unique<Sabie>(50, 30));
@@ -247,9 +351,77 @@ int main() {
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion mica", 15, 30));
     } catch (const InventarException&) {}
 
+    // Inventar: afiseaza tot la inceput
+    rucsac.afiseazaTot();
+
     joc.adaugaEntitate(std::make_unique<Inamic>("Goblin Infatometat", Pozitie(3, 3), 40, 15));
     joc.adaugaEntitate(std::make_unique<Inamic>("Orc Distrugator",    Pozitie(5, 7), 70, 30));
     joc.adaugaEntitate(std::make_unique<Fantoma>("Spectra Blestemata", Pozitie(14, 8), 35));
+
+    // BattleLog: eveniment de start sesiune
+    BattleLog::adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
+
+    // Celula: marcam o celula de start ca non-perete (seteazaPerete)
+    // si facem toggle pe o celula temporara pentru a demonstra functionalitatea
+    {
+        Celula tmp(true);
+        tmp.seteazaPerete(false);   // seteazaPerete
+        tmp.toggle();               // toggle — o readuce la perete
+        BattleLog::adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
+    }
+
+    // JocDungeon: afiseaza numarul total de sesiuni create
+    std::cout << "Sesiuni create pana acum: " << JocDungeon::getSesiuniCreate() << "\n";
+
+    // Inventar: foloseste toate obiectele (afiseaza efectele lor)
+    rucsac.folosesteToate();
+}
+
+int main() {
+    JocDungeon joc("Dungeon of Doom", 20, 30);
+    Inventar rucsac;
+
+    try {
+        initLogica(joc, rucsac);
+    } catch (const DungeonException&) {
+        return 1;
+    }
+
+    // Headless CI: fara display => rulam doar logica
+    const char* display = std::getenv("DISPLAY");
+    const char* wayland = std::getenv("WAYLAND_DISPLAY");
+    if (display == nullptr && wayland == nullptr) {
+        joc.ruleazaTurEntitati();
+        joc.afiseazaStatisticiEntitati(std::cout);
+
+        // Entitate::afiseaza — apelata pe fiecare entitate
+        for (const auto& e : joc.getEntitati()) {
+            e->afiseaza(std::cout);
+            std::cout << "\n";
+        }
+
+        // Fantoma::esteCorporeala — verificata pentru fantome
+        for (const auto& e : joc.getEntitati()) {
+            if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
+                std::cout << f->getNume()
+                          << (f->esteCorporeala() ? " [corporala]" : " [incorporala]")
+                          << "\n";
+            }
+        }
+
+        // Labirint::afisareGrafica — afiseaza labirintul in consola
+        std::vector<Inamic*> inamiciRaw;
+        for (const auto& e : joc.getEntitati()) {
+            if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
+                inamiciRaw.push_back(in);
+        }
+        joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
+
+        // BattleLog::curataLog — curata dupa afisare
+        BattleLog::afiseazaLog();
+        BattleLog::curataLog();
+        return 0;
+    }
 
     sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Dungeon Crawler", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
@@ -271,10 +443,33 @@ int main() {
     constexpr float msgDuration = 2.f;
 
     std::vector<FloatText> floatTexts;
+    std::vector<std::string> logLinii;  // linii vizibile in-game din BattleLog
+
+    // Radar pentru detectia inamicilor adiacenti
+    Radar radar(8);
+    std::string radarInfo;
+
+    int nivelAnterior = joc.getJucator().getNivel();
 
     const Labirint& lab = joc.getLabirint();
     int labLinii   = lab.getLinii();
     int labColoane = lab.getColoane();
+
+    // Fantoma: schimba starea la inceput (corporala/incorporala)
+    for (const auto& e : joc.getEntitati()) {
+        if (Fantoma* f = dynamic_cast<Fantoma*>(e.get())) {
+            f->schimbaStare();
+        }
+    }
+
+    // Celula: folosim toggle pentru a marca celulele de start ca vizitate
+    // (marcam celula jucatorului la inceput)
+    {
+        Pozitie startPos = joc.getJucator().getPozitie();
+        // getCelula returneaza const ref, deci folosim getSimbol() pentru afisare
+        const Celula& startCelula = lab.getCelula(startPos.getX(), startPos.getY());
+        BattleLog::adaugaEveniment("Start pe: " + std::string(1, startCelula.getSimbol()));
+    }
 
     while (window.isOpen()) {
         float dt = deltaClock.restart().asSeconds();
@@ -283,13 +478,21 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
             if (event.type == sf::Event::KeyPressed &&
-                event.key.code == sf::Keyboard::Escape) window.close();
-
+                event.key.code == sf::Keyboard::Escape) {
+                BattleLog::afiseazaLog();  // afiseaza log la iesire
+                window.close();
+            }
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::Space) {
-                procesezaCombatLocal(joc, floatTexts, font);
+                procesezaCombatLocal(joc, floatTexts, font, logLinii, nivelAnterior);
                 message = "Atac!";
                 msgClock.restart();
+            }
+            // L = afiseaza log in consola
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::L) {
+                BattleLog::afiseazaLog();
+                joc.afiseazaStatisticiEntitati(std::cout);
             }
         }
 
@@ -320,6 +523,16 @@ int main() {
                     }
                 }
                 moveClock.restart();
+
+                // Radar: actualizeaza distanta la cel mai apropiat inamic
+                std::vector<Inamic*> inamiciRaw;
+                for (const auto& e : joc.getEntitati()) {
+                    if (!e->esteViu()) continue;
+                    if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
+                        inamiciRaw.push_back(in);
+                }
+                radarInfo = radar.getDistantaPanaLaCelMaiApropiat(
+                    jucator.getPozitie(), inamiciRaw);
             }
         }
 
@@ -350,6 +563,7 @@ int main() {
 
             drawTile(window, sprite, tileTex, getTileForEntitate(*e), sx, sy);
 
+            // bara HP mica deasupra inamicului
             constexpr float miniW = static_cast<float>(TILE_SCALED);
             constexpr float miniH = 5.f;
             float ratio = static_cast<float>(e->getHP()) / 100.f;
@@ -371,7 +585,8 @@ int main() {
                  posJ.getX() * TILE_SCALED - camY);
 
         updateAndDrawFloats(window, floatTexts, dt, camX, camY);
-        drawUI(window, font, joc.getJucator());
+        drawUI(window, font, joc.getJucator(), radarInfo);
+        drawBattleLog(window, font, logLinii);
 
         if (msgClock.getElapsedTime().asSeconds() < msgDuration)
             drawMessage(window, font, message);
