@@ -86,8 +86,9 @@ int main() {
         }
 
         Inventar rucsac(2);
-        rucsac.adaugaObiect(std::make_unique<Pistoale>());
-        rucsac.adaugaObiect(std::make_unique<Sabie>());
+        auto pistolNou = std::make_unique<Pistoale>();
+        pistolNou->reincarca();
+        rucsac.adaugaObiect(std::move(pistolNou));        rucsac.adaugaObiect(std::make_unique<Sabie>());
         try {
             rucsac.adaugaObiect(std::make_unique<Spear>());
         } catch (const InventarException& e) {
