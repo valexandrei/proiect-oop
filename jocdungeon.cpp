@@ -88,7 +88,16 @@ void JocDungeon::procesezaFantome(Jucator& juc) {
 }
 
 void JocDungeon::verificaInteractiune() {
-    // Placeholder — logica de interactiune cu obiectele din labirint
+    Pozitie posJucator = jucator.getPozitie();
+    for (const auto& e : entitati) {
+        if (!e->esteViu()) continue;
+        Pozitie posEntitate = e->getPozitie();
+        if (posJucator.getX() == posEntitate.getX() &&
+            posJucator.getY() == posEntitate.getY()) {
+            std::cout << "[Interactiune] " << jucator.getNume()
+                      << " s-a intalnit cu " << e->getNume() << "!\n";
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const JocDungeon& joc) {

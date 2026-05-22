@@ -23,7 +23,7 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE INTERNAL "Override update strateg
 FetchContent_Declare(
         SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
-        GIT_TAG        2.6.1
+        GIT_TAG        2.6.2
         GIT_SHALLOW    1
         GIT_PROGRESS   ON
 )
