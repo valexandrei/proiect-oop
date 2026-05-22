@@ -86,10 +86,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         radar.cpp
         radar.h
         exceptii.h
-        vrajitor_inamic.cpp
-        vrajitor_inamic.h
         fantoma.cpp
         fantoma.h
+        vrajitorinamic.cpp
+        vrajitorinamic.h
 )
 target_sources(${MAIN_EXECUTABLE_NAME}
     PRIVATE

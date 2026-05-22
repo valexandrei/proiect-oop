@@ -1,4 +1,4 @@
-#include "vrajitor_inamic.h"
+#include "vrajitorinamic.h"
 #include <iostream>
 
 VrajitorInamic::VrajitorInamic(const std::string& n, Pozitie p, int health,

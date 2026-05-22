@@ -8,8 +8,7 @@
 #include "labirint.h"
 #include "jucator.h"
 #include "inamic.h"
-#include "vrajitor_inamic.h"
-#include "fantoma.h"
+#include "vrajitorinamic.h"
 
 class JocDungeon {
 private:
@@ -33,11 +32,10 @@ public:
     void afiseazaStatisticiEntitati() const;
     void procesezaCombat(Jucator& jucator);
     void procesezaVrajitori(Jucator& jucator);
-    void procesezaFantome(Jucator& jucator);
 
     Labirint& getLabirint() { return labirint; }
     const Labirint& getLabirint() const { return labirint; }
-    static int getSesiuniCreate() { return sesiuniCreate; }
+    [[nodiscard]] static int getSesiuniCreate() { return sesiuniCreate; }
 
     friend std::ostream& operator<<(std::ostream& os, const JocDungeon& joc);
 };

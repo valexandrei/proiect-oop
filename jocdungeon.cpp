@@ -73,15 +73,6 @@ void JocDungeon::procesezaVrajitori(Jucator& jucator) {
     }
 }
 
-void JocDungeon::procesezaFantome(Jucator& jucator) {
-    for (const auto& e : entitati) {
-        if (!e->esteViu()) continue;
-        if (Fantoma* fantoma = dynamic_cast<Fantoma*>(e.get())) {
-            fantoma->ataculFazic(jucator);
-        }
-    }
-}
-
 std::ostream& operator<<(std::ostream& os, const JocDungeon& joc) {
     os << "JocDungeon: '" << joc.numeSesiune << "'"
        << " | Entitati: " << joc.entitati.size();

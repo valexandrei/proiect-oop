@@ -4,8 +4,7 @@
 
 #include "jucator.h"
 #include "inamic.h"
-#include "vrajitor_inamic.h"
-#include "fantoma.h"
+#include "vrajitorinamic.h"
 #include "jocdungeon.h"
 #include "radar.h"
 #include "gamedata.h"
@@ -50,7 +49,6 @@ int main() {
         joc.adaugaEntitate(std::make_unique<Inamic>("Goblin", Pozitie(2, 2), 40, 20));
         joc.adaugaEntitate(std::make_unique<Inamic>("Orc", Pozitie(3, 1), 70, 35));
         joc.adaugaEntitate(std::make_unique<VrajitorInamic>("Lich", Pozitie(4, 4), 50));
-        joc.adaugaEntitate(std::make_unique<Fantoma>("Fantoma Regelui", Pozitie(1, 3)));
 
         // --- Functii virtuale prin pointer de baza ---
         joc.ruleazaTurEntitati();
@@ -59,16 +57,8 @@ int main() {
         // --- dynamic_cast cu sens ---
         joc.procesezaCombat(erou);
         joc.procesezaVrajitori(erou);
-        joc.procesezaFantome(erou);
 
         std::cout << "\nHP erou dupa combat: " << erou.getHP() << "\n";
-
-        // --- Fantoma folosita direct ---
-        Fantoma f("Umbra", Pozitie(0, 0));
-        std::cout << "\n" << f << "\n";
-        f.schimbaStare();
-        std::cout << f << "\n";
-        f.ataculFazic(erou);
 
         // --- Radar ---
         Radar miniMap(3);
