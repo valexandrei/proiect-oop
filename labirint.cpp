@@ -5,7 +5,9 @@
 #include <queue>
 
 Labirint::Labirint(int linii, int coloane)
-    : linii(linii), coloane(coloane), grid(linii, std::vector<Celula>(coloane, Celula(true))) {
+    : linii(linii), coloane(coloane),
+      grid(linii, std::vector<Celula>(coloane, Celula(true))),
+      pozitieUsa(-1, -1) {
     genereazaRandom();
 }
 
@@ -15,6 +17,7 @@ void Labirint::genereazaRandom() {
             grid[r][c] = Celula(true);
     carvePath(1, 1);
     grid[1][1] = Celula(false);
+    calculeazaPozitieUsa();
 }
 
 void Labirint::carvePath(int r, int c) {
@@ -32,11 +35,42 @@ void Labirint::carvePath(int r, int c) {
     }
 }
 
+void Labirint::calculeazaPozitieUsa() {
+    // Cauta cea mai indepartata celula libera fata de (1,1) folosind BFS
+    std::vector<std::vector<int>> dist(linii, std::vector<int>(coloane, -1));
+    std::queue<Pozitie> q;
+    q.push(Pozitie(1, 1));
+    dist[1][1] = 0;
+
+    const int dr[] = {-1, 1, 0, 0};
+    const int dc[] = {0, 0, -1, 1};
+
+    Pozitie celMaiDeparte(1, 1);
+    int maxDist = 0;
+
+    while (!q.empty()) {
+        Pozitie cur = q.front(); q.pop();
+        for (int d = 0; d < 4; ++d) {
+            int nr = cur.getX() + dr[d];
+            int nc = cur.getY() + dc[d];
+            if (nr < 0 || nr >= linii || nc < 0 || nc >= coloane) continue;
+            if (dist[nr][nc] != -1) continue;
+            if (grid[nr][nc].estePerete()) continue;
+            dist[nr][nc] = dist[cur.getX()][cur.getY()] + 1;
+            if (dist[nr][nc] > maxDist) {
+                maxDist = dist[nr][nc];
+                celMaiDeparte = Pozitie(nr, nc);
+            }
+            q.push(Pozitie(nr, nc));
+        }
+    }
+    pozitieUsa = celMaiDeparte;
+}
+
 Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const {
     if (from.getX() == to.getX() && from.getY() == to.getY())
         return from;
 
-    // BFS
     std::vector<std::vector<bool>> vizitat(linii, std::vector<bool>(coloane, false));
     std::vector<std::vector<Pozitie>> parinte(linii, std::vector<Pozitie>(coloane, Pozitie(-1, -1)));
 
@@ -49,8 +83,7 @@ Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const
 
     bool gasit = false;
     while (!q.empty() && !gasit) {
-        Pozitie cur = q.front();
-        q.pop();
+        Pozitie cur = q.front(); q.pop();
         for (int d = 0; d < 4; ++d) {
             int nr = cur.getX() + dr[d];
             int nc = cur.getY() + dc[d];
@@ -59,22 +92,18 @@ Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const
             if (grid[nr][nc].estePerete()) continue;
             vizitat[nr][nc] = true;
             parinte[nr][nc] = cur;
-            if (nr == to.getX() && nc == to.getY()) {
-                gasit = true;
-                break;
-            }
+            if (nr == to.getX() && nc == to.getY()) { gasit = true; break; }
             q.push(Pozitie(nr, nc));
         }
     }
 
     if (!gasit) return from;
 
-    // Reconstituie drumul si returneaza primul pas
     Pozitie cur = to;
     while (!(parinte[cur.getX()][cur.getY()].getX() == from.getX() &&
              parinte[cur.getX()][cur.getY()].getY() == from.getY())) {
         cur = parinte[cur.getX()][cur.getY()];
-        if (cur.getX() == -1) return from; // siguranta
+        if (cur.getX() == -1) return from;
     }
     return cur;
 }
@@ -82,18 +111,13 @@ Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const
 void Labirint::afisareGrafica(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const {
     for (int r = 0; r < linii; ++r) {
         for (int c = 0; c < coloane; ++c) {
-            if (posJucator.getX() == r && posJucator.getY() == c) {
-                std::cout << '@';
-                continue;
-            }
+            if (posJucator.getX() == r && posJucator.getY() == c) { std::cout << '@'; continue; }
             bool eInamic = false;
             for (const auto* i : inamici) {
-                if (i->getPozitie().getX() == r && i->getPozitie().getY() == c) {
-                    eInamic = true;
-                    break;
-                }
+                if (i->getPozitie().getX() == r && i->getPozitie().getY() == c) { eInamic = true; break; }
             }
             if (eInamic) std::cout << 'E';
+            else if (pozitieUsa.getX() == r && pozitieUsa.getY() == c) std::cout << 'D';
             else std::cout << (grid[r][c].estePerete() ? '#' : '.');
         }
         std::cout << '\n';

@@ -22,14 +22,16 @@ public:
     [[nodiscard]] const Celula& getCelula(int r, int c) const { return grid[r][c]; }
     [[nodiscard]] Celula& getCelula(int r, int c) { return grid[r][c]; }
 
-    // Returneaza urmatorul pas din pozitia 'from' spre 'to' evitand peretii.
-    // Returneaza 'from' daca nu exista drum.
     [[nodiscard]] Pozitie urmatoarePozitie(const Pozitie& from, const Pozitie& to) const;
+
+    [[nodiscard]] Pozitie getPozitieUsa() const { return pozitieUsa; }
 
 private:
     int linii;
     int coloane;
     std::vector<std::vector<Celula>> grid;
+    Pozitie pozitieUsa;
 
     void carvePath(int r, int c);
+    void calculeazaPozitieUsa();
 };
