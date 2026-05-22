@@ -18,21 +18,36 @@ public:
     Entitate(std::string n, Pozitie p, int health, int atk, int def);
     virtual ~Entitate() = default;
 
+    void afiseaza(std::ostream& os) const { afisareImpl(os); }
+
     virtual void actioneaza() = 0;
-    virtual void afisare() const = 0;
+    virtual int calculeazaDamage() const = 0;
+    virtual Entitate* clone() const = 0;
 
     Pozitie getPozitie() const { return pos; }
     void setPozitie(Pozitie p) { pos = p; }
-    std::string const& getNume() const { return nume; }
+    const std::string& getNume() const { return nume; }
     int getHP() const { return hp; }
+    bool esteViu() const { return hp > 0; }
     void primesteDamage(int dmg);
 
+    friend void swap(Entitate& a, Entitate& b) noexcept {
+        using std::swap;
+        swap(a.nume, b.nume);
+        swap(a.pos, b.pos);
+        swap(a.hp, b.hp);
+        swap(a.hpMax, b.hpMax);
+        swap(a.atac, b.atac);
+        swap(a.aparare, b.aparare);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Entitate& e) {
-        os << "Entitate: " << e.nume
-           << " | HP: " << e.hp << "/" << e.hpMax
-           << " | Pozitie: " << e.pos;
+        e.afisareImpl(os);
         return os;
     }
+
+protected:
+    virtual void afisareImpl(std::ostream& os) const;
 };
 
 #endif

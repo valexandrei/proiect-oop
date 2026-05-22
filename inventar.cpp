@@ -1,4 +1,5 @@
 #include "inventar.h"
+#include "exceptii.h"
 #include <iostream>
 
 Inventar::Inventar(int cap) : capacitateMaxima(cap) {
@@ -7,27 +8,25 @@ Inventar::Inventar(int cap) : capacitateMaxima(cap) {
 
 Inventar::~Inventar() {
     for (Obiect* obj : iteme) {
-        delete obj; 
+        delete obj;
     }
     iteme.clear();
-    std::cout << "[Debug] Inventarul a fost curatat din memorie.\n";
 }
 
-bool Inventar::adaugaObiect(Obiect* obj) {
-    if (obj == nullptr) return false;
-
-    if (iteme.size() < (size_t)capacitateMaxima) {
-        iteme.push_back(obj);
-        std::cout << "Obiectul " << obj->getNume() << " a fost adaugat in inventar.\n";
-        return true;
+void Inventar::adaugaObiect(Obiect* obj) {
+    if (obj == nullptr) {
+        throw InventarException("null");
     }
-
-    std::cout << "Inventar plin! Nu s-a putut adauga: " << obj->getNume() << "\n";
-    return false;
+    if (static_cast<int>(iteme.size()) >= capacitateMaxima) {
+        throw InventarException(obj->getNume());
+    }
+    iteme.push_back(obj);
+    std::cout << "Adaugat in inventar: " << obj->getNume() << "\n";
 }
 
 void Inventar::afiseazaTot() const {
-    std::cout << "--- CONTINUT INVENTAR (" << iteme.size() << "/" << capacitateMaxima << ") ---\n";
+    std::cout << "--- CONTINUT INVENTAR ("
+              << iteme.size() << "/" << capacitateMaxima << ") ---\n";
     if (iteme.empty()) {
         std::cout << "Inventarul este gol.\n";
         return;
@@ -35,11 +34,11 @@ void Inventar::afiseazaTot() const {
     for (const auto* obj : iteme) {
         obj->afisare();
     }
-    std::cout << "------------------------------------------\n";
+    std::cout << "-------------------------------\n";
 }
 
 void Inventar::folosesteToate() {
-    std::cout << "Se folosesc toate obiectele din inventar...\n";
+    std::cout << "Se folosesc toate obiectele...\n";
     for (auto* obj : iteme) {
         obj->foloseste();
     }

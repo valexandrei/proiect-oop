@@ -1,8 +1,11 @@
 #include <iostream>
 #include <string>
-#include <vector>
+#include <memory>
+
 #include "jucator.h"
 #include "inamic.h"
+#include "vrajitor_inamic.h"
+#include "fantoma.h"
 #include "jocdungeon.h"
 #include "radar.h"
 #include "gamedata.h"
@@ -10,107 +13,127 @@
 #include "exceptii.h"
 #include "inventar.h"
 #include "pistoale.h"
-#include "celula.h"
-#include "potiune.h"
 #include "sabie.h"
 #include "spear.h"
+#include "celula.h"
+#include "potiune.h"
 
 int main() {
     try {
+        // --- Citire date ---
         std::string numeCitit;
         int dimL, dimC;
-
         if (!(std::cin >> numeCitit >> dimL >> dimC)) {
             numeCitit = "Aragorn";
             dimL = 5;
             dimC = 5;
         }
 
-        std::cout << GameData::getPovesteFundal() << "\n";
-        std::cout << GameData::getMesajLevelUp(2) << "\n";
+        std::cout << "\n" << GameData::getPovesteFundal() << "\n\n";
 
+        // --- Jucator: constructor, copiere, operator= (copy-and-swap) ---
         Jucator erou(numeCitit, Pozitie(1, 1));
         Jucator copieErou = erou;
-        Jucator p3("Test", Pozitie(0,0));
+        Jucator p3("Test", Pozitie(0, 0));
         p3 = erou;
 
-        erou.setPozitie(Pozitie(1, 2));
         erou.adaugaXP(150);
+        std::cout << erou << "\n\n";
 
-        std::cout << "Nivel: " << erou.getNivel() << " | XP: " << erou.getXP()
-                  << " / " << erou.getXPNecesar() << " | HP: " << erou.getHP() << "\n";
-
+        // --- Creare sesiune ---
         JocDungeon joc("Dungeon of Doom", dimL, dimC);
         joc.initSesiune();
-        const Labirint& lab = joc.getLabirint();
+        std::cout << "Sesiuni create (static): "
+                  << JocDungeon::getSesiuniCreate() << "\n\n";
 
-        std::cout << "--- STATUS INITIAL JUCATOR ---\n";
-        std::cout << erou << "\n";
-        std::cout << "Linii labirint: " << lab.getLinii() << " | Coloane: " << lab.getColoane() << "\n";
-        lab.afisareGrafica(erou.getPozitie(), std::vector<Inamic*>());
+        // --- Adaugare entitati prin pointer de baza ---
+        joc.adaugaEntitate(std::make_unique<Inamic>("Goblin", Pozitie(2, 2), 40, 20));
+        joc.adaugaEntitate(std::make_unique<Inamic>("Orc", Pozitie(3, 1), 70, 35));
+        joc.adaugaEntitate(std::make_unique<VrajitorInamic>("Lich", Pozitie(4, 4), 50));
+        joc.adaugaEntitate(std::make_unique<Fantoma>("Fantoma Regelui", Pozitie(1, 3)));
 
-        std::vector<Inamic*> inamici;
-        Inamic* boss = new Inamic("Seful Goblins", Pozitie(2, 2), 50);
-        inamici.push_back(boss);
+        // --- Functii virtuale prin pointer de baza ---
+        joc.ruleazaTurEntitati();
+        joc.afiseazaStatisticiEntitati();
 
+        // --- dynamic_cast cu sens ---
+        joc.procesezaCombat(erou);
+        joc.procesezaVrajitori(erou);
+        joc.procesezaFantome(erou);
+
+        std::cout << "\nHP erou dupa combat: " << erou.getHP() << "\n";
+
+        // --- Fantoma folosita direct ---
+        Fantoma f("Umbra", Pozitie(0, 0));
+        std::cout << "\n" << f << "\n";
+        f.schimbaStare();
+        std::cout << f << "\n";
+        f.ataculFazic(erou);
+
+        // --- Radar ---
         Radar miniMap(3);
-        miniMap.afiseazaRadar(erou.getPozitie(), inamici);
-        std::cout << miniMap.getDistantaPanaLaCelMaiApropiat(erou.getPozitie(), inamici) << "\n";
+        std::cout << "\n" << miniMap << "\n";
 
         try {
             Radar radarStricat(-1);
-        } catch (const DungeonException& e) {
-            std::cout << "[Sistemul de securitate]: " << e.what() << "\n";
+        } catch (const RadarDefectException& e) {
+            std::cout << "[Exceptie Radar]: " << e.what() << "\n";
         }
 
-        if (lab.estePozitieValida(2, 2)) {
-            boss->ataca(erou);
+        // --- Exceptie pozitie invalida ---
+        try {
+            const Labirint& lab = joc.getLabirint();
+            if (!lab.estePozitieValida(99, 99)) {
+                throw PozitieInvalidaException(99, 99);
+            }
+        } catch (const PozitieInvalidaException& e) {
+            std::cout << "[Exceptie Pozitie]: " << e.what() << "\n";
         }
 
-        std::string jurnal = BattleLog::genereazaDescriereLupta(erou.getNume(), boss->getNume(), 30);
-        BattleLog::adaugaEveniment(jurnal);
+        // --- Inventar cu exceptie ---
+        Inventar rucsac(2);
+        try {
+            rucsac.adaugaObiect(new Pistoale());
+            rucsac.adaugaObiect(new Sabie());
+            rucsac.adaugaObiect(new Spear());
+        } catch (const InventarException& e) {
+            std::cout << "[Exceptie Inventar]: " << e.what() << "\n";
+        }
+        std::cout << "\n" << rucsac << "\n";
+        rucsac.folosesteToate();
+
+        // --- BattleLog ---
+        BattleLog::adaugaEveniment(
+            BattleLog::genereazaDescriereLupta(erou.getNume(), "Goblin", 30));
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
 
-        std::vector<std::string> tipuri = GameData::getTipuriInamici();
-        for(const auto& t : tipuri) {
-            std::cout << "Inamic potential: " << GameData::getDescriereInamic(t) << "\n";
-        }
-
-        Inventar rucsac;
-        Pistoale* armaGasita = new Pistoale();
-        armaGasita->reincarca();
-        if(rucsac.adaugaObiect(armaGasita)) {
-            rucsac.afiseazaTot();
-            rucsac.folosesteToate();
-        }
-
-        Celula c(Pozitie(0,0), '#');
-        if (c.eWorldWall()) {
-            c.spargeZid();
-        }
-
-        joc.verificaInteractiune(erou, inamici);
+        // --- operator<< pentru toate clasele ---
         std::cout << "\n--- TEST operator<< ---\n";
-        std::cout << erou << "\n";
-        std::cout << *boss << "\n";
         std::cout << joc << "\n";
-        std::cout << miniMap << "\n";
-        std::cout << rucsac << "\n";
+        std::cout << copieErou << "\n";
 
+        Potiune hp("Potion of Healing", 30, 50);
         Sabie sabie;
         Spear lance;
-        Potiune potion("Potion of Healing", 30, 50);
+        Pistoale pistol;
+        std::cout << hp << "\n";
         std::cout << sabie << "\n";
         std::cout << lance << "\n";
-        std::cout << potion << "\n";
-
-        Pistoale pistol;
         std::cout << pistol << "\n";
-        for (auto* i : inamici) delete i;
-        inamici.clear();
+
+        Celula c(Pozitie(0, 0), '#');
+        if (c.eWorldWall()) c.spargeZid();
+        std::cout << c << "\n";
+
+        // --- GameData ---
+        std::cout << "\n" << GameData::getMesajLevelUp(3) << "\n";
+        for (const auto& t : GameData::getTipuriInamici()) {
+            std::cout << "  " << t << ": " << GameData::getDescriereInamic(t) << "\n";
+        }
+
     } catch (const std::exception& e) {
-        std::cerr << "A aparut o eroare neasteptata: " << e.what() << "\n";
+        std::cerr << "Eroare neasteptata: " << e.what() << "\n";
         return 1;
     }
 

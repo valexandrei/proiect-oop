@@ -13,7 +13,7 @@ public:
     explicit Inventar(int cap = 5);
     ~Inventar();
 
-    bool adaugaObiect(Obiect* obj);
+    void adaugaObiect(Obiect* obj);
     void afiseazaTot() const;
     void folosesteToate();
 
