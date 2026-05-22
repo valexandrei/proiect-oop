@@ -31,15 +31,15 @@ struct TileCoord {
         return sf::IntRect(col * (TILE_SIZE + 1), row * (TILE_SIZE + 1), TILE_SIZE, TILE_SIZE);
     }
 };
-static constexpr TileCoord TC_FLOOR  = {0, 0};
-static constexpr TileCoord TC_WALL   = {4, 3};
-static constexpr TileCoord TC_PLAYER = {1, 8};
-static constexpr TileCoord TC_WIZARD = {3, 9};
-static constexpr TileCoord TC_GHOST  = {1, 10};
-static constexpr TileCoord TC_ORC    = {2, 7};
-static constexpr TileCoord TC_GOBLIN = {0, 9};
-static constexpr TileCoord TC_DOOR   = {2, 2};
-static constexpr TileCoord TC_BOSS   = {0, 8};
+[[maybe_unused]] static constexpr TileCoord TC_FLOOR  = {0, 0};
+[[maybe_unused]] static constexpr TileCoord TC_WALL   = {4, 3};
+[[maybe_unused]] static constexpr TileCoord TC_PLAYER = {1, 8};
+[[maybe_unused]] static constexpr TileCoord TC_WIZARD = {3, 9};
+[[maybe_unused]] static constexpr TileCoord TC_GHOST  = {1, 10};
+[[maybe_unused]] static constexpr TileCoord TC_ORC    = {2, 7};
+[[maybe_unused]] static constexpr TileCoord TC_GOBLIN = {0, 9};
+[[maybe_unused]] static constexpr TileCoord TC_DOOR   = {2, 2};
+[[maybe_unused]] static constexpr TileCoord TC_BOSS   = {0, 8};
 
 static void drawTile(sf::RenderWindow& window, sf::Sprite& sprite,
                      const sf::Texture& tex, TileCoord tc, int sx, int sy) {
