@@ -5,12 +5,16 @@
 int JocDungeon::sesiuniCreate = 0;
 
 JocDungeon::JocDungeon(std::string nume, int l, int c)
-    : numeSesiune(std::move(nume)), labirint(l, c) {
+    : numeSesiune(std::move(nume)),
+      jucator("Erou", Pozitie(1, 1)),
+      labirint(l, c) {
     ++sesiuniCreate;
 }
 
 JocDungeon::JocDungeon(const JocDungeon& other)
-    : numeSesiune(other.numeSesiune), labirint(other.labirint) {
+    : numeSesiune(other.numeSesiune),
+      jucator(other.jucator),
+      labirint(other.labirint) {
     for (const auto& e : other.entitati) {
         entitati.push_back(std::unique_ptr<Entitate>(e->clone()));
     }
@@ -20,6 +24,7 @@ JocDungeon::JocDungeon(const JocDungeon& other)
 void swap(JocDungeon& a, JocDungeon& b) noexcept {
     using std::swap;
     swap(a.numeSesiune, b.numeSesiune);
+    swap(a.jucator, b.jucator);
     swap(a.labirint, b.labirint);
     swap(a.entitati, b.entitati);
 }
@@ -47,30 +52,43 @@ void JocDungeon::ruleazaTurEntitati() {
     }
 }
 
-void JocDungeon::afiseazaStatisticiEntitati() const {
-    std::cout << "\n--- STATISTICI '" << numeSesiune << "' ---\n";
+void JocDungeon::afiseazaStatisticiEntitati(std::ostream& os) const {
+    os << "\n--- STATISTICI '" << numeSesiune << "' ---\n";
     for (const auto& e : entitati) {
-        std::cout << *e << " | Damage potential: "
-                  << e->calculeazaDamage() << "\n";
+        os << *e << " | Damage potential: "
+           << e->calculeazaDamage() << "\n";
     }
 }
 
-void JocDungeon::procesezaCombat(Jucator& jucator) {
+void JocDungeon::procesezaCombat(Jucator& juc) {
     for (const auto& e : entitati) {
         if (!e->esteViu()) continue;
-if (const Inamic* inamic = dynamic_cast<const Inamic*>(e.get())) {
-            inamic->ataca(jucator);
+        if (const Inamic* inamic = dynamic_cast<const Inamic*>(e.get())) {
+            inamic->ataca(juc);
         }
     }
 }
 
-void JocDungeon::procesezaVrajitori(Jucator& jucator) {
+void JocDungeon::procesezaVrajitori(Jucator& juc) {
     for (const auto& e : entitati) {
         if (!e->esteViu()) continue;
         if (VrajitorInamic* vraj = dynamic_cast<VrajitorInamic*>(e.get())) {
-            vraj->aruncaVraja(jucator);
+            vraj->aruncaVraja(juc);
         }
     }
+}
+
+void JocDungeon::procesezaFantome(Jucator& juc) {
+    for (const auto& e : entitati) {
+        if (!e->esteViu()) continue;
+        if (Fantoma* fantoma = dynamic_cast<Fantoma*>(e.get())) {
+            fantoma->ataculFazic(juc);
+        }
+    }
+}
+
+void JocDungeon::verificaInteractiune() {
+    // Placeholder — logica de interactiune cu obiectele din labirint
 }
 
 std::ostream& operator<<(std::ostream& os, const JocDungeon& joc) {

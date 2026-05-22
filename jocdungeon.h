@@ -1,43 +1,49 @@
-#ifndef JOCDUNGEON_H
-#define JOCDUNGEON_H
-
-#include <string>
+#pragma once
 #include <vector>
 #include <memory>
-#include <iostream>
-#include "labirint.h"
+#include <string>
+#include "entitate.h"
 #include "jucator.h"
 #include "inamic.h"
 #include "vrajitorinamic.h"
+#include "fantoma.h"
+#include "labirint.h"
+#include "inventar.h"
+#include "battlelog.h"
 
 class JocDungeon {
-private:
-    std::string numeSesiune;
-    Labirint labirint;
-    std::vector<std::unique_ptr<Entitate>> entitati;
-
-    static int sesiuniCreate;
-
 public:
-    JocDungeon(std::string nume, int l, int c);
+    JocDungeon(std::string nume, int linii, int coloane);
     JocDungeon(const JocDungeon& other);
     JocDungeon& operator=(JocDungeon other);
+    ~JocDungeon() = default;
 
     friend void swap(JocDungeon& a, JocDungeon& b) noexcept;
+    friend std::ostream& operator<<(std::ostream& os, const JocDungeon& joc);
 
     void initSesiune();
-    void adaugaEntitate(std::unique_ptr<Entitate> e);
-
+    void verificaInteractiune();
     void ruleazaTurEntitati();
-    void afiseazaStatisticiEntitati() const;
+    void afiseazaStatisticiEntitati(std::ostream& os) const;
     void procesezaCombat(Jucator& jucator);
     void procesezaVrajitori(Jucator& jucator);
+    void procesezaFantome(Jucator& jucator);
+    void adaugaEntitate(std::unique_ptr<Entitate> e);
 
+    Jucator& getJucator() { return jucator; }
+    const Jucator& getJucator() const { return jucator; }
     Labirint& getLabirint() { return labirint; }
     const Labirint& getLabirint() const { return labirint; }
-    [[nodiscard]] static int getSesiuniCreate() { return sesiuniCreate; }
+    const std::vector<std::unique_ptr<Entitate>>& getEntitati() const { return entitati; }
+    const std::string& getNume() const { return numeSesiune; }
 
-    friend std::ostream& operator<<(std::ostream& os, const JocDungeon& joc);
+    static int getSesiuniCreate() { return sesiuniCreate; }
+
+private:
+    std::string numeSesiune;
+    Jucator jucator;
+    Labirint labirint;
+    Inventar inventar;
+    std::vector<std::unique_ptr<Entitate>> entitati;
+    static int sesiuniCreate;
 };
-
-#endif

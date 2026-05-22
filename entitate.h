@@ -28,6 +28,7 @@ public:
     void setPozitie(Pozitie p) { pos = p; }
     const std::string& getNume() const { return nume; }
     int getHP() const { return hp; }
+    int getHPMax() const { return hpMax; }
     bool esteViu() const { return hp > 0; }
     void primesteDamage(int dmg);
 

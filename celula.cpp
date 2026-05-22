@@ -1,17 +1,21 @@
 #include "celula.h"
-#include <iostream>
+#include <stdexcept>
 
-Celula::Celula(Pozitie _p, char _tip) : p(_p), tip(_tip) {}
-
-void Celula::spargeZid() {
-    tip = '.';
+// Returneaza caracterul vizual al celulei: '#' pentru perete, '.' pentru coridor
+char Celula::getSimbol() const {
+    return perete ? '#' : '.';
 }
 
-bool Celula::eWorldWall() const {
-    return tip == '#';
+// Inverseaza tipul celulei (perete <-> coridor)
+void Celula::toggle() {
+    perete = !perete;
 }
 
-std::ostream& operator<<(std::ostream& os, const Celula& c) {
-    os << c.tip;
-    return os;
+// Verifica daca doua celule sunt de acelasi tip
+bool Celula::operator==(const Celula& other) const {
+    return perete == other.perete;
+}
+
+bool Celula::operator!=(const Celula& other) const {
+    return !(*this == other);
 }

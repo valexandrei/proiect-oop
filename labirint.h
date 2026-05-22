@@ -1,30 +1,31 @@
-#ifndef LABIRINT_H
-#define LABIRINT_H
-#include "celula.h"
+#pragma once
 #include <vector>
-#include <iostream>
+#include <ostream>
+#include "celula.h"
+#include "pozitie.h"
+#include "inamic.h"
 
 class Labirint {
-private:
-    int linii, coloane;
-    std::vector<std::vector<Celula>> grija;
-
 public:
-    explicit Labirint(int L = 5, int C = 5);
-    int getLinii() const { return linii; }
-    int getColoane() const { return coloane; }
+    Labirint(int linii, int coloane);
+    Labirint(const Labirint&) = default;
+    Labirint& operator=(const Labirint&) = default;
+    ~Labirint() = default;
 
-    bool estePozitieValida(int x, int y) const;
-    void afisareGrafica(const Pozitie& posJucator, const std::vector<class Inamic*>& inamici) const;
+    friend std::ostream& operator<<(std::ostream& os, const Labirint& l);
 
-    friend std::ostream& operator<<(std::ostream& os, const Labirint& l) {
-        for (const auto& rand : l.grija) {
-            for (const auto& cel : rand) {
-                os << cel << " ";
-            }
-            os << "\n";
-        }
-        return os;
-    }
+    void genereazaRandom();
+    void afisareGrafica(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const;
+
+    [[nodiscard]] int getLinii() const { return linii; }
+    [[nodiscard]] int getColoane() const { return coloane; }
+    [[nodiscard]] const Celula& getCelula(int r, int c) const { return grid[r][c]; }
+    [[nodiscard]] Celula& getCelula(int r, int c) { return grid[r][c]; }
+
+private:
+    int linii;
+    int coloane;
+    std::vector<std::vector<Celula>> grid;
+
+    void carvePath(int r, int c);
 };
-#endif

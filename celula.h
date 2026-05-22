@@ -1,19 +1,27 @@
-#ifndef CELULA_H
-#define CELULA_H
-#include "pozitie.h"
-#include <iostream>
+#pragma once
+#include <ostream>
 
 class Celula {
-private:
-    Pozitie p;
-    char tip;
-
 public:
-    explicit Celula(Pozitie _p = Pozitie(), char _tip = '.');
+    explicit Celula(bool ePerete = false) : perete(ePerete) {}
 
-    void spargeZid();
-    bool eWorldWall() const;
+    [[nodiscard]] bool estePerete() const { return perete; }
+    void seteazaPerete(bool val) { perete = val; }
 
-    friend std::ostream& operator<<(std::ostream& os, const Celula& c);
+    // Returneaza '#' sau '.' pentru afisare
+    [[nodiscard]] char getSimbol() const;
+
+    // Inverseaza tipul celulei (perete <-> coridor)
+    void toggle();
+
+    bool operator==(const Celula& other) const;
+    bool operator!=(const Celula& other) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Celula& c) {
+        os << (c.perete ? '#' : '.');
+        return os;
+    }
+
+private:
+    bool perete;
 };
-#endif

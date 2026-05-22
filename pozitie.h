@@ -8,9 +8,14 @@ private:
 
 public:
     explicit Pozitie(int _x = 0, int _y = 0);
-    int getX() const;
-    int getY() const;
+
+    [[nodiscard]] int getX() const;
+    [[nodiscard]] int getY() const;
+
+    void setX(int val) { x = val; }
+    void setY(int val) { y = val; }
 
     friend std::ostream& operator<<(std::ostream& os, const Pozitie& p);
 };
+
 #endif
