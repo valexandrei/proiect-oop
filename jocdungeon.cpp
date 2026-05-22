@@ -58,7 +58,7 @@ void JocDungeon::afiseazaStatisticiEntitati() const {
 void JocDungeon::procesezaCombat(Jucator& jucator) {
     for (const auto& e : entitati) {
         if (!e->esteViu()) continue;
-        if (Inamic* inamic = dynamic_cast<Inamic*>(e.get())) {
+if (const Inamic* inamic = dynamic_cast<const Inamic*>(e.get())) {
             inamic->ataca(jucator);
         }
     }
