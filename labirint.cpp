@@ -2,6 +2,7 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <queue>
 
 Labirint::Labirint(int linii, int coloane)
     : linii(linii), coloane(coloane), grid(linii, std::vector<Celula>(coloane, Celula(true))) {
@@ -29,6 +30,53 @@ void Labirint::carvePath(int r, int c) {
             carvePath(nr, nc);
         }
     }
+}
+
+Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const {
+    if (from.getX() == to.getX() && from.getY() == to.getY())
+        return from;
+
+    // BFS
+    std::vector<std::vector<bool>> vizitat(linii, std::vector<bool>(coloane, false));
+    std::vector<std::vector<Pozitie>> parinte(linii, std::vector<Pozitie>(coloane, Pozitie(-1, -1)));
+
+    std::queue<Pozitie> q;
+    q.push(from);
+    vizitat[from.getX()][from.getY()] = true;
+
+    const int dr[] = {-1, 1, 0, 0};
+    const int dc[] = {0, 0, -1, 1};
+
+    bool gasit = false;
+    while (!q.empty() && !gasit) {
+        Pozitie cur = q.front();
+        q.pop();
+        for (int d = 0; d < 4; ++d) {
+            int nr = cur.getX() + dr[d];
+            int nc = cur.getY() + dc[d];
+            if (nr < 0 || nr >= linii || nc < 0 || nc >= coloane) continue;
+            if (vizitat[nr][nc]) continue;
+            if (grid[nr][nc].estePerete()) continue;
+            vizitat[nr][nc] = true;
+            parinte[nr][nc] = cur;
+            if (nr == to.getX() && nc == to.getY()) {
+                gasit = true;
+                break;
+            }
+            q.push(Pozitie(nr, nc));
+        }
+    }
+
+    if (!gasit) return from;
+
+    // Reconstituie drumul si returneaza primul pas
+    Pozitie cur = to;
+    while (!(parinte[cur.getX()][cur.getY()].getX() == from.getX() &&
+             parinte[cur.getX()][cur.getY()].getY() == from.getY())) {
+        cur = parinte[cur.getX()][cur.getY()];
+        if (cur.getX() == -1) return from; // siguranta
+    }
+    return cur;
 }
 
 void Labirint::afisareGrafica(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const {

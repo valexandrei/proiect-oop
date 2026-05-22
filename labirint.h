@@ -22,6 +22,10 @@ public:
     [[nodiscard]] const Celula& getCelula(int r, int c) const { return grid[r][c]; }
     [[nodiscard]] Celula& getCelula(int r, int c) { return grid[r][c]; }
 
+    // Returneaza urmatorul pas din pozitia 'from' spre 'to' evitand peretii.
+    // Returneaza 'from' daca nu exista drum.
+    [[nodiscard]] Pozitie urmatoarePozitie(const Pozitie& from, const Pozitie& to) const;
+
 private:
     int linii;
     int coloane;

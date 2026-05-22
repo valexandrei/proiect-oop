@@ -361,9 +361,7 @@ int main() {
         BattleLog::adaugaEveniment("Start pe: " + std::string(1, startCelula.getSimbol()));
     }
 
-    const char* display = std::getenv("DISPLAY");
-    const char* wayland = std::getenv("WAYLAND_DISPLAY");
-    if (display == nullptr && wayland == nullptr) {
+    if (std::getenv("GITHUB_ACTIONS") != nullptr) {
         joc.ruleazaTurEntitati();
         joc.afiseazaStatisticiEntitati(std::cout);
 
@@ -401,13 +399,18 @@ int main() {
     tileTex.setSmooth(false);
 
     sf::Font font;
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
-        font.loadFromFile("assets/font.ttf");
+    if (!font.loadFromFile("assets/font.ttf") &&
+        !font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf") &&
+        !font.loadFromFile("/System/Library/Fonts/Helvetica.ttc") &&
+        !font.loadFromFile("C:/Windows/Fonts/arial.ttf"))
+        return 1;
 
     sf::Sprite sprite;
     sf::Clock moveClock;
+    sf::Clock enemyMoveClock;
     sf::Clock deltaClock;
-    constexpr float moveDelay = 0.15f;
+    constexpr float moveDelay      = 0.15f;
+    constexpr float enemyMoveDelay = 0.5f;
     std::string message;
     sf::Clock msgClock;
     constexpr float msgDuration = 2.f;
@@ -484,6 +487,27 @@ int main() {
                 }
                 radarInfo = radar.getDistantaPanaLaCelMaiApropiat(
                     jucator.getPozitie(), inamiciRaw);
+            }
+        }
+
+        if (enemyMoveClock.getElapsedTime().asSeconds() >= enemyMoveDelay) {
+            enemyMoveClock.restart();
+            Pozitie posJucator = joc.getJucator().getPozitie();
+            for (const auto& e : joc.getEntitati()) {
+                if (!e->esteViu()) continue;
+                Pozitie urm = lab.urmatoarePozitie(e->getPozitie(), posJucator);
+                if (urm.getX() == posJucator.getX() && urm.getY() == posJucator.getY())
+                    continue;
+                bool ocupat = false;
+                for (const auto& alt : joc.getEntitati()) {
+                    if (alt.get() == e.get() || !alt->esteViu()) continue;
+                    if (alt->getPozitie().getX() == urm.getX() &&
+                        alt->getPozitie().getY() == urm.getY()) {
+                        ocupat = true;
+                        break;
+                    }
+                }
+                if (!ocupat) e->setPozitie(urm);
             }
         }
 
