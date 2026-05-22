@@ -37,7 +37,10 @@ int main() {
         p3 = erou;
 
         erou.adaugaXP(150);
-        std::cout << erou << "\n\n";
+        std::cout << erou << "\n";
+        std::cout << "Nivel: " << erou.getNivel()
+                  << " | XP: " << erou.getXP()
+                  << "/" << erou.getXPNecesar() << "\n\n";
 
         // --- Creare sesiune ---
         JocDungeon joc("Dungeon of Doom", dimL, dimC);
@@ -60,9 +63,20 @@ int main() {
 
         std::cout << "\nHP erou dupa combat: " << erou.getHP() << "\n";
 
+        // --- Labirint ---
+        const Labirint& lab = joc.getLabirint();
+        std::cout << "Labirint " << lab.getLinii() << "x" << lab.getColoane() << ":\n";
+        std::vector<Inamic*> inamiciVechi;
+        lab.afisareGrafica(erou.getPozitie(), inamiciVechi);
+
+        // --- setPozitie ---
+        erou.setPozitie(Pozitie(2, 2));
+
         // --- Radar ---
         Radar miniMap(3);
         std::cout << "\n" << miniMap << "\n";
+        miniMap.afiseazaRadar(erou.getPozitie(), inamiciVechi);
+        std::cout << miniMap.getDistantaPanaLaCelMaiApropiat(erou.getPozitie(), inamiciVechi) << "\n";
 
         try {
             Radar radarStricat(-1);
@@ -72,7 +86,6 @@ int main() {
 
         // --- Exceptie pozitie invalida ---
         try {
-            const Labirint& lab = joc.getLabirint();
             if (!lab.estePozitieValida(99, 99)) {
                 throw PozitieInvalidaException(99, 99);
             }
@@ -83,13 +96,16 @@ int main() {
         // --- Inventar cu exceptie ---
         Inventar rucsac(2);
         try {
-            rucsac.adaugaObiect(new Pistoale());
+            Pistoale* pistol = new Pistoale();
+            pistol->reincarca();
+            rucsac.adaugaObiect(pistol);
             rucsac.adaugaObiect(new Sabie());
             rucsac.adaugaObiect(new Spear());
         } catch (const InventarException& e) {
             std::cout << "[Exceptie Inventar]: " << e.what() << "\n";
         }
         std::cout << "\n" << rucsac << "\n";
+        rucsac.afiseazaTot();
         rucsac.folosesteToate();
 
         // --- BattleLog ---
@@ -106,12 +122,21 @@ int main() {
         Potiune hp("Potion of Healing", 30, 50);
         Sabie sabie;
         Spear lance;
-        Pistoale pistol;
+        Pistoale pistol2;
         std::cout << hp << "\n";
         std::cout << sabie << "\n";
         std::cout << lance << "\n";
-        std::cout << pistol << "\n";
+        std::cout << pistol2 << "\n";
 
+        // --- NVI afiseaza ---
+        erou.afiseaza(std::cout);
+        std::cout << "\n";
+
+        // --- Inamic getXPReward ---
+        Inamic inamicTest("Test", Pozitie(0, 0), 30);
+        std::cout << "XP reward inamic: " << inamicTest.getXPReward() << "\n";
+
+        // --- Celula ---
         Celula c(Pozitie(0, 0), '#');
         if (c.eWorldWall()) c.spargeZid();
         std::cout << c << "\n";

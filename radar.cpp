@@ -8,7 +8,7 @@
 Radar::Radar(int raza)
     : razaScanare(raza), simbolJucator('@'), simbolInamic('!'), simbolGol('.') {
     if (raza < 0) {
-        throw RadarDefectException();
+        throw RadarDefectException(raza);
     }
 }
 
