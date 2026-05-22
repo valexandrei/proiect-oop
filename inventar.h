@@ -2,18 +2,18 @@
 #define INVENTAR_H
 
 #include <vector>
+#include <memory>
 #include <iostream>
 #include "obiect.h"
 
 class Inventar {
-    std::vector<Obiect*> iteme;
+    std::vector<std::unique_ptr<Obiect>> iteme;
     int capacitateMaxima;
 
 public:
     explicit Inventar(int cap = 5);
-    ~Inventar();
 
-    void adaugaObiect(Obiect* obj);
+    void adaugaObiect(std::unique_ptr<Obiect> obj);
     void afiseazaTot() const;
     void folosesteToate();
 
@@ -22,7 +22,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Inventar& inv) {
         os << "Inventar (" << inv.iteme.size() << "/" << inv.capacitateMaxima << "):\n";
-        for (const auto* obj : inv.iteme) {
+        for (const auto& obj : inv.iteme) {
             os << "  " << *obj << "\n";
         }
         return os;

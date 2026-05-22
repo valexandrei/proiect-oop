@@ -53,7 +53,6 @@ int main() {
         joc.ruleazaTurEntitati();
         joc.afiseazaStatisticiEntitati();
 
-
         joc.procesezaCombat(erou);
         joc.procesezaVrajitori(erou);
 
@@ -64,9 +63,7 @@ int main() {
         std::vector<Inamic*> inamiciVechi;
         lab.afisareGrafica(erou.getPozitie(), inamiciVechi);
 
-
         erou.setPozitie(Pozitie(2, 2));
-
 
         Radar miniMap(3);
         std::cout << "\n" << miniMap << "\n";
@@ -89,12 +86,10 @@ int main() {
         }
 
         Inventar rucsac(2);
+        rucsac.adaugaObiect(std::make_unique<Pistoale>());
+        rucsac.adaugaObiect(std::make_unique<Sabie>());
         try {
-            Pistoale* pistol = new Pistoale();
-            pistol->reincarca();
-            rucsac.adaugaObiect(pistol);
-            rucsac.adaugaObiect(new Sabie());
-            rucsac.adaugaObiect(new Spear());
+            rucsac.adaugaObiect(std::make_unique<Spear>());
         } catch (const InventarException& e) {
             std::cout << "[Exceptie Inventar]: " << e.what() << "\n";
         }

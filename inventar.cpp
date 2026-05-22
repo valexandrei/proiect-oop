@@ -6,22 +6,15 @@ Inventar::Inventar(int cap) : capacitateMaxima(cap) {
     iteme.reserve(cap);
 }
 
-Inventar::~Inventar() {
-    for (Obiect* obj : iteme) {
-        delete obj;
-    }
-    iteme.clear();
-}
-
-void Inventar::adaugaObiect(Obiect* obj) {
-    if (obj == nullptr) {
+void Inventar::adaugaObiect(std::unique_ptr<Obiect> obj) {
+    if (!obj) {
         throw InventarException("null");
     }
     if (static_cast<int>(iteme.size()) >= capacitateMaxima) {
         throw InventarException(obj->getNume());
     }
-    iteme.push_back(obj);
     std::cout << "Adaugat in inventar: " << obj->getNume() << "\n";
+    iteme.push_back(std::move(obj));
 }
 
 void Inventar::afiseazaTot() const {
@@ -31,7 +24,7 @@ void Inventar::afiseazaTot() const {
         std::cout << "Inventarul este gol.\n";
         return;
     }
-    for (const auto* obj : iteme) {
+    for (const auto& obj : iteme) {
         obj->afisare();
     }
     std::cout << "-------------------------------\n";
@@ -39,7 +32,7 @@ void Inventar::afiseazaTot() const {
 
 void Inventar::folosesteToate() {
     std::cout << "Se folosesc toate obiectele...\n";
-    for (auto* obj : iteme) {
+    for (const auto& obj : iteme) {
         obj->foloseste();
     }
 }
