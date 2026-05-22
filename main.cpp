@@ -16,10 +16,10 @@
 #include "spear.h"
 #include "celula.h"
 #include "potiune.h"
+#include "fantoma.h"
 
 int main() {
     try {
-        // --- Citire date ---
         std::string numeCitit;
         int dimL, dimC;
         if (!(std::cin >> numeCitit >> dimL >> dimC)) {
@@ -30,7 +30,6 @@ int main() {
 
         std::cout << "\n" << GameData::getPovesteFundal() << "\n\n";
 
-        // --- Jucator: constructor, copiere, operator= (copy-and-swap) ---
         Jucator erou(numeCitit, Pozitie(1, 1));
         Jucator copieErou = erou;
         Jucator p3("Test", Pozitie(0, 0));
@@ -42,41 +41,38 @@ int main() {
                   << " | XP: " << erou.getXP()
                   << "/" << erou.getXPNecesar() << "\n\n";
 
-        // --- Creare sesiune ---
         JocDungeon joc("Dungeon of Doom", dimL, dimC);
         joc.initSesiune();
         std::cout << "Sesiuni create (static): "
                   << JocDungeon::getSesiuniCreate() << "\n\n";
 
-        // --- Adaugare entitati prin pointer de baza ---
         joc.adaugaEntitate(std::make_unique<Inamic>("Goblin", Pozitie(2, 2), 40, 20));
         joc.adaugaEntitate(std::make_unique<Inamic>("Orc", Pozitie(3, 1), 70, 35));
         joc.adaugaEntitate(std::make_unique<VrajitorInamic>("Lich", Pozitie(4, 4), 50));
 
-        // --- Functii virtuale prin pointer de baza ---
         joc.ruleazaTurEntitati();
         joc.afiseazaStatisticiEntitati();
 
-        // --- dynamic_cast cu sens ---
+
         joc.procesezaCombat(erou);
         joc.procesezaVrajitori(erou);
 
         std::cout << "\nHP erou dupa combat: " << erou.getHP() << "\n";
 
-        // --- Labirint ---
         const Labirint& lab = joc.getLabirint();
         std::cout << "Labirint " << lab.getLinii() << "x" << lab.getColoane() << ":\n";
         std::vector<Inamic*> inamiciVechi;
         lab.afisareGrafica(erou.getPozitie(), inamiciVechi);
 
-        // --- setPozitie ---
+
         erou.setPozitie(Pozitie(2, 2));
 
-        // --- Radar ---
+
         Radar miniMap(3);
         std::cout << "\n" << miniMap << "\n";
         miniMap.afiseazaRadar(erou.getPozitie(), inamiciVechi);
-        std::cout << miniMap.getDistantaPanaLaCelMaiApropiat(erou.getPozitie(), inamiciVechi) << "\n";
+        std::cout << miniMap.getDistantaPanaLaCelMaiApropiat(
+            erou.getPozitie(), inamiciVechi) << "\n";
 
         try {
             Radar radarStricat(-1);
@@ -84,7 +80,6 @@ int main() {
             std::cout << "[Exceptie Radar]: " << e.what() << "\n";
         }
 
-        // --- Exceptie pozitie invalida ---
         try {
             if (!lab.estePozitieValida(99, 99)) {
                 throw PozitieInvalidaException(99, 99);
@@ -93,7 +88,6 @@ int main() {
             std::cout << "[Exceptie Pozitie]: " << e.what() << "\n";
         }
 
-        // --- Inventar cu exceptie ---
         Inventar rucsac(2);
         try {
             Pistoale* pistol = new Pistoale();
@@ -108,13 +102,28 @@ int main() {
         rucsac.afiseazaTot();
         rucsac.folosesteToate();
 
-        // --- BattleLog ---
         BattleLog::adaugaEveniment(
             BattleLog::genereazaDescriereLupta(erou.getNume(), "Goblin", 30));
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
 
-        // --- operator<< pentru toate clasele ---
+        erou.afiseaza(std::cout);
+        std::cout << "\n";
+
+        {
+            auto inamicTest = std::make_unique<Inamic>("Test", Pozitie(0, 0), 30);
+            std::cout << "XP reward inamic: " << inamicTest->getXPReward() << "\n";
+        }
+
+        Fantoma fantoma("Fantoma Regelui", Pozitie(1, 3));
+        std::cout << "\n" << fantoma << "\n";
+        std::cout << "E corporala: " << fantoma.esteCorporeala() << "\n";
+        fantoma.schimbaStare();
+        std::cout << "Dupa schimbare: " << fantoma.esteCorporeala() << "\n";
+        std::cout << fantoma << "\n";
+        fantoma.ataculFazic(erou);
+        std::cout << "HP erou dupa atac fazic: " << erou.getHP() << "\n";
+
         std::cout << "\n--- TEST operator<< ---\n";
         std::cout << joc << "\n";
         std::cout << copieErou << "\n";
@@ -128,23 +137,14 @@ int main() {
         std::cout << lance << "\n";
         std::cout << pistol2 << "\n";
 
-        // --- NVI afiseaza ---
-        erou.afiseaza(std::cout);
-        std::cout << "\n";
-
-        // --- Inamic getXPReward ---
-        Inamic inamicTest("Test", Pozitie(0, 0), 30);
-        std::cout << "XP reward inamic: " << inamicTest.getXPReward() << "\n";
-
-        // --- Celula ---
         Celula c(Pozitie(0, 0), '#');
         if (c.eWorldWall()) c.spargeZid();
         std::cout << c << "\n";
 
-        // --- GameData ---
         std::cout << "\n" << GameData::getMesajLevelUp(3) << "\n";
         for (const auto& t : GameData::getTipuriInamici()) {
-            std::cout << "  " << t << ": " << GameData::getDescriereInamic(t) << "\n";
+            std::cout << "  " << t << ": "
+                      << GameData::getDescriereInamic(t) << "\n";
         }
 
     } catch (const std::exception& e) {
