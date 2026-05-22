@@ -20,6 +20,11 @@ include(FetchContent)
 set(FETCHCONTENT_QUIET OFF CACHE INTERNAL "Override verbose output" FORCE)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE INTERNAL "Override update strategy" FORCE)
 
+set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
+set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(
         SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -27,8 +32,6 @@ FetchContent_Declare(
         GIT_SHALLOW    1
         GIT_PROGRESS   ON
 )
-set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
-set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(SFML)
 
 ###############################################################################
@@ -75,6 +78,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         vrajitorinamic.cpp
         vrajitorinamic.h
 )
+
 target_sources(${MAIN_EXECUTABLE_NAME}
         PRIVATE
         src/Example.cpp

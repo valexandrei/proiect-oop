@@ -1,3 +1,79 @@
+#if defined(__APPLE__) && defined(__GNUC__) && !defined(__clang__)
+#include <iostream>
+#include <memory>
+#include "jocdungeon.h"
+#include "inventar.h"
+#include "exceptii.h"
+#include "pistoale.h"
+#include "sabie.h"
+#include "spear.h"
+#include "potiune.h"
+#include "battlelog.h"
+#include "gamedata.h"
+#include "radar.h"
+#include "fantoma.h"
+#include "inamic.h"
+
+static void initLogica(JocDungeon& joc, Inventar& rucsac) {
+    joc.initSesiune();
+    std::cout << GameData::getPovesteFundal() << "\n\n";
+    for (const auto& tip : GameData::getTipuriInamici())
+        std::cout << "  - " << tip << "\n";
+    try {
+        rucsac.adaugaObiect(std::make_unique<Potiune>("Potion of Healing", 30, 50));
+        rucsac.adaugaObiect(std::make_unique<Sabie>(50, 30));
+        auto pistolNou = std::make_unique<Pistoale>();
+        pistolNou->reincarca();
+        rucsac.adaugaObiect(std::move(pistolNou));
+    } catch (const InventarException&) {}
+    rucsac.afiseazaTot();
+    rucsac.folosesteToate();
+    joc.adaugaEntitate(std::make_unique<Inamic>("Goblin Infatometat", Pozitie(3, 3), 40, 15));
+    joc.adaugaEntitate(std::make_unique<Inamic>("Orc Distrugator", Pozitie(5, 7), 70, 30));
+    joc.adaugaEntitate(std::make_unique<Fantoma>("Spectra Blestemata", Pozitie(14, 8), 35));
+    BattleLog::adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
+    Celula tmp(true);
+    tmp.seteazaPerete(false);
+    tmp.toggle();
+    BattleLog::adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
+    std::cout << "Sesiuni create: " << JocDungeon::getSesiuniCreate() << "\n";
+}
+
+int main() {
+    JocDungeon joc("Dungeon of Doom", 20, 30);
+    Inventar rucsac;
+    Radar radar(8);
+    try {
+        initLogica(joc, rucsac);
+    } catch (const DungeonException&) {
+        return 1;
+    }
+    for (const auto& e : joc.getEntitati()) {
+        if (Fantoma* f = dynamic_cast<Fantoma*>(e.get()))
+            f->schimbaStare();
+    }
+    joc.ruleazaTurEntitati();
+    joc.afiseazaStatisticiEntitati(std::cout);
+    for (const auto& e : joc.getEntitati()) {
+        e->afiseaza(std::cout);
+        std::cout << "\n";
+        if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get()))
+            std::cout << (f->esteCorporeala() ? " [corporala]" : " [incorporala]") << "\n";
+    }
+    std::vector<Inamic*> inamiciRaw;
+    for (const auto& e : joc.getEntitati()) {
+        if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
+            inamiciRaw.push_back(in);
+    }
+    joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
+    radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
+    BattleLog::afiseazaLog();
+    BattleLog::curataLog();
+    return 0;
+}
+
+#else
+
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <sstream>
@@ -115,19 +191,16 @@ static void drawBar(sf::RenderWindow& window,
     bgShape.setFillColor(bg);
     bgShape.setPosition(x, y);
     window.draw(bgShape);
-
     sf::RectangleShape fgShape({w * std::max(0.f, ratio), h});
     fgShape.setFillColor(fg);
     fgShape.setPosition(x, y);
     window.draw(fgShape);
-
     sf::RectangleShape border({w, h});
     border.setFillColor(sf::Color::Transparent);
     border.setOutlineColor(sf::Color(200, 200, 200, 180));
     border.setOutlineThickness(1.5f);
     border.setPosition(x, y);
     window.draw(border);
-
     sf::Text txt;
     txt.setFont(font);
     txt.setCharacterSize(13);
@@ -145,20 +218,15 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font,
     constexpr float barW = 240.f;
     constexpr float barH = 22.f;
     float y = 14.f;
-
     float hpRatio = static_cast<float>(j.getHP()) / static_cast<float>(j.getHPMax());
     drawBar(window, x, y, barW, barH, hpRatio,
             hpColor(hpRatio), sf::Color(60, 0, 0),
-            "HP: " + std::to_string(j.getHP()) + " / " + std::to_string(j.getHPMax()),
-            font);
-
+            "HP: " + std::to_string(j.getHP()) + " / " + std::to_string(j.getHPMax()), font);
     y += barH + 8.f;
     float xpRatio = static_cast<float>(j.getXP()) / static_cast<float>(j.getXPNecesar());
     drawBar(window, x, y, barW, barH, xpRatio,
             sf::Color(30, 160, 220), sf::Color(0, 40, 70),
-            "XP: " + std::to_string(j.getXP()) + " / " + std::to_string(j.getXPNecesar()),
-            font);
-
+            "XP: " + std::to_string(j.getXP()) + " / " + std::to_string(j.getXPNecesar()), font);
     y += barH + 10.f;
     sf::Text nameText;
     nameText.setFont(font);
@@ -169,7 +237,6 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font,
     nameText.setString(j.getNume() + "  Niv." + std::to_string(j.getNivel()));
     nameText.setPosition(x, y);
     window.draw(nameText);
-
     if (!radarInfo.empty()) {
         y += 22.f;
         sf::Text radarText;
@@ -232,31 +299,24 @@ static void procesezaCombatLocal(JocDungeon& joc,
     Jucator& jucator = joc.getJucator();
     Pozitie jPos = jucator.getPozitie();
     bool atacatCeva = false;
-
     for (const auto& e : joc.getEntitati()) {
         if (!e->esteViu()) continue;
         if (!suntAdiacente(jPos, e->getPozitie())) continue;
         atacatCeva = true;
-
         int dmgDat = jucator.calculeazaDamage();
         e->primesteDamage(dmgDat);
-
         std::string descriere = BattleLog::genereazaDescriereLupta(
             jucator.getNume(), e->getNume(), dmgDat);
         BattleLog::adaugaEveniment(descriere);
         logLinii.push_back(descriere);
-
-        spawnFloatText(floats, font,
-                       "-" + std::to_string(dmgDat),
+        spawnFloatText(floats, font, "-" + std::to_string(dmgDat),
                        static_cast<float>(e->getPozitie().getY()),
                        static_cast<float>(e->getPozitie().getX()),
                        sf::Color(255, 80, 80));
-
         if (!e->esteViu()) {
             std::string evMoarte = e->getNume() + " a fost eliminat!";
             BattleLog::adaugaEveniment(evMoarte);
             logLinii.push_back(evMoarte);
-
             if (const Inamic* in = dynamic_cast<const Inamic*>(e.get())) {
                 jucator.adaugaXP(in->getXPReward());
                 spawnFloatText(floats, font,
@@ -274,21 +334,16 @@ static void procesezaCombatLocal(JocDungeon& joc,
             }
             continue;
         }
-
         int dmgPrimit = e->calculeazaDamage();
         jucator.primesteDamage(dmgPrimit);
-
         std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
         BattleLog::adaugaEveniment(evContra);
         logLinii.push_back(evContra);
         logLinii.push_back(GameData::getDescriereInamic(e->getNume()));
-
-        spawnFloatText(floats, font,
-                       "-" + std::to_string(dmgPrimit),
+        spawnFloatText(floats, font, "-" + std::to_string(dmgPrimit),
                        static_cast<float>(jPos.getY()),
                        static_cast<float>(jPos.getX()),
                        sf::Color(255, 60, 60));
-
         std::ostringstream oss;
         e->afiseaza(oss);
         if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
@@ -296,7 +351,6 @@ static void procesezaCombatLocal(JocDungeon& joc,
                 (f->esteCorporeala() ? " [corp]" : " [incorp]"));
         }
     }
-
     if (!atacatCeva) {
         BattleLog::adaugaEveniment(jucator.getNume() + " loveste in gol.");
         logLinii.push_back(jucator.getNume() + " loveste in gol.");
@@ -305,13 +359,11 @@ static void procesezaCombatLocal(JocDungeon& joc,
 
 static void initLogica(JocDungeon& joc, Inventar& rucsac) {
     joc.initSesiune();
-
     std::cout << GameData::getPovesteFundal() << "\n\n";
     std::cout << "Inamici in dungeon:\n";
     for (const auto& tip : GameData::getTipuriInamici())
         std::cout << "  - " << tip << "\n";
     std::cout << "\n";
-
     try {
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion of Healing", 30, 50));
         rucsac.adaugaObiect(std::make_unique<Sabie>(50, 30));
@@ -321,21 +373,16 @@ static void initLogica(JocDungeon& joc, Inventar& rucsac) {
         rucsac.adaugaObiect(std::move(pistolNou));
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion mica", 15, 30));
     } catch (const InventarException&) {}
-
     rucsac.afiseazaTot();
     rucsac.folosesteToate();
-
     joc.adaugaEntitate(std::make_unique<Inamic>("Goblin Infatometat", Pozitie(3, 3), 40, 15));
-    joc.adaugaEntitate(std::make_unique<Inamic>("Orc Distrugator",    Pozitie(5, 7), 70, 30));
+    joc.adaugaEntitate(std::make_unique<Inamic>("Orc Distrugator", Pozitie(5, 7), 70, 30));
     joc.adaugaEntitate(std::make_unique<Fantoma>("Spectra Blestemata", Pozitie(14, 8), 35));
-
     BattleLog::adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
-
     Celula tmp(true);
     tmp.seteazaPerete(false);
     tmp.toggle();
     BattleLog::adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
-
     std::cout << "Sesiuni create: " << JocDungeon::getSesiuniCreate() << "\n";
 }
 
@@ -357,8 +404,10 @@ int main() {
 
     {
         Pozitie startPos = joc.getJucator().getPozitie();
-        const Celula& startCelula = joc.getLabirint().getCelula(startPos.getX(), startPos.getY());
-        BattleLog::adaugaEveniment("Start pe: " + std::string(1, startCelula.getSimbol()));
+        const Celula& startCelula = joc.getLabirint().getCelula(
+            startPos.getX(), startPos.getY());
+        BattleLog::adaugaEveniment("Start pe: " +
+            std::string(1, startCelula.getSimbol()));
     }
 
     const char* display = std::getenv("DISPLAY");
@@ -366,20 +415,12 @@ int main() {
     if (display == nullptr && wayland == nullptr) {
         joc.ruleazaTurEntitati();
         joc.afiseazaStatisticiEntitati(std::cout);
-
         for (const auto& e : joc.getEntitati()) {
             e->afiseaza(std::cout);
             std::cout << "\n";
+            if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get()))
+                std::cout << (f->esteCorporeala() ? " [corporala]" : " [incorporala]") << "\n";
         }
-
-        for (const auto& e : joc.getEntitati()) {
-            if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
-                std::cout << f->getNume()
-                          << (f->esteCorporeala() ? " [corporala]" : " [incorporala]")
-                          << "\n";
-            }
-        }
-
         std::vector<Inamic*> inamiciRaw;
         for (const auto& e : joc.getEntitati()) {
             if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
@@ -387,7 +428,6 @@ int main() {
         }
         joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
         radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
-
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
         return 0;
@@ -475,7 +515,6 @@ int main() {
                     }
                 }
                 moveClock.restart();
-
                 std::vector<Inamic*> inamiciRaw;
                 for (const auto& e : joc.getEntitati()) {
                     if (!e->esteViu()) continue;
@@ -511,19 +550,15 @@ int main() {
             int sy = ep.getX() * TILE_SCALED - camY;
             if (sx < -TILE_SCALED || sx > SCREEN_W ||
                 sy < -TILE_SCALED || sy > SCREEN_H) continue;
-
             drawTile(window, sprite, tileTex, getTileForEntitate(*e), sx, sy);
-
             constexpr float miniW = static_cast<float>(TILE_SCALED);
             constexpr float miniH = 5.f;
             float ratio = static_cast<float>(e->getHP()) / 100.f;
             ratio = std::min(1.f, std::max(0.f, ratio));
-
             sf::RectangleShape miniBg({miniW, miniH});
             miniBg.setFillColor(sf::Color(80, 0, 0));
             miniBg.setPosition(static_cast<float>(sx), static_cast<float>(sy) - miniH - 2.f);
             window.draw(miniBg);
-
             sf::RectangleShape miniFg({miniW * ratio, miniH});
             miniFg.setFillColor(hpColor(ratio));
             miniFg.setPosition(static_cast<float>(sx), static_cast<float>(sy) - miniH - 2.f);
@@ -546,3 +581,5 @@ int main() {
 
     return 0;
 }
+
+#endif
