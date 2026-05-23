@@ -6,7 +6,7 @@
 #include "pozitie.h"
 
 class Entitate {
-protected:
+private:
     std::string nume;
     Pozitie pos;
     int hp;
@@ -14,22 +14,30 @@ protected:
     int atac;
     int aparare;
 
+protected:
+    int getAtac() const { return atac; }
+    int getAparare() const { return aparare; }
+    void setHP(int val) { hp = val; }
+    void setHPMax(int val) { hpMax = val; }
+
+    virtual void afisareImpl(std::ostream& os) const;
+
 public:
     Entitate(std::string n, Pozitie p, int health, int atk, int def);
     virtual ~Entitate() = default;
 
-    void afiseaza(std::ostream& os) const { afisareImpl(os); }
-
     virtual void actioneaza() = 0;
-    virtual int calculeazaDamage() const = 0;
+    virtual int calculeazaDamage() const { return atac; }
+    virtual bool esteViu() const { return hp > 0; }
     virtual Entitate* clone() const = 0;
+
+    void afiseaza(std::ostream& os) const { afisareImpl(os); }
 
     Pozitie getPozitie() const { return pos; }
     void setPozitie(Pozitie p) { pos = p; }
     const std::string& getNume() const { return nume; }
     int getHP() const { return hp; }
     int getHPMax() const { return hpMax; }
-    bool esteViu() const { return hp > 0; }
     void primesteDamage(int dmg);
 
     friend void swap(Entitate& a, Entitate& b) noexcept {
@@ -46,9 +54,6 @@ public:
         e.afisareImpl(os);
         return os;
     }
-
-protected:
-    virtual void afisareImpl(std::ostream& os) const;
 };
 
 #endif

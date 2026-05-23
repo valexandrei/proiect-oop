@@ -11,7 +11,11 @@ private:
     int damageMagie;
 
 protected:
-    void afisareImpl(std::ostream& os) const override;
+    void afisareImpl(std::ostream& os) const override {
+        os << static_cast<const Entitate&>(*this)
+           << " [Vrajitor | Mana: " << manaCurenta << "/" << manaMax
+           << " | Damage magie: " << calculeazaDamage() << "]";
+    }
 
 public:
     VrajitorInamic(const std::string& n, Pozitie p, int health,
@@ -19,10 +23,17 @@ public:
 
     void actioneaza() override;
     [[nodiscard]] int calculeazaDamage() const override;
-    [[nodiscard]] VrajitorInamic* clone() const override;
+    [[nodiscard]] VrajitorInamic* clone() const override {
+        return new VrajitorInamic(*this);
+    }
 
     void aruncaVraja(Entitate& tinta);
     [[nodiscard]] bool areMana() const { return manaCurenta >= 20; }
+
+    friend std::ostream& operator<<(std::ostream& os, const VrajitorInamic& v) {
+        v.afisareImpl(os);
+        return os;
+    }
 };
 
 #endif

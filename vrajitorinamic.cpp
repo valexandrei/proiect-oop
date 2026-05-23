@@ -6,13 +6,10 @@ VrajitorInamic::VrajitorInamic(const std::string& n, Pozitie p, int health,
     : Entitate(n, p, health, 5, 1),
       manaMax(mana), manaCurenta(mana), damageMagie(dmgMagie) {}
 
-VrajitorInamic* VrajitorInamic::clone() const {
-    return new VrajitorInamic(*this);
-}
-
 void VrajitorInamic::actioneaza() {
-    std::cout << "[Vrajitor] " << nume
-              << " isi concentreaza energia magica la " << pos << ".\n";
+    std::cout << "[Vrajitor] " << getNume()
+              << " isi concentreaza energia magica la "
+              << getPozitie() << ".\n";
 }
 
 int VrajitorInamic::calculeazaDamage() const {
@@ -23,19 +20,15 @@ int VrajitorInamic::calculeazaDamage() const {
 
 void VrajitorInamic::aruncaVraja(Entitate& tinta) {
     if (!areMana()) {
-        std::cout << "[Vrajitor] " << nume << " nu are destula mana!\n";
+        std::cout << "[Vrajitor] " << getNume()
+                  << " nu are destula mana!\n";
         return;
     }
     int dmg = calculeazaDamage();
     manaCurenta -= 20;
-    std::cout << "[Vrajitor] " << nume << " arunca o vraja asupra "
-              << tinta.getNume() << " pentru " << dmg << " damage magic!\n";
+    std::cout << "[Vrajitor] " << getNume()
+              << " arunca o vraja asupra "
+              << tinta.getNume() << " pentru "
+              << dmg << " damage magic!\n";
     tinta.primesteDamage(dmg);
-}
-
-void VrajitorInamic::afisareImpl(std::ostream& os) const {
-    os << "[Vrajitor Inamic] " << nume
-       << " | HP: " << hp << "/" << hpMax
-       << " | Mana: " << manaCurenta << "/" << manaMax
-       << " | Damage magie: " << calculeazaDamage();
 }

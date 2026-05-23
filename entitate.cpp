@@ -1,7 +1,8 @@
 #include "entitate.h"
 
 Entitate::Entitate(std::string n, Pozitie p, int health, int atk, int def)
-    : nume(std::move(n)), pos(p), hp(health), hpMax(health), atac(atk), aparare(def) {}
+    : nume(std::move(n)), pos(p), hp(health), hpMax(health),
+      atac(atk), aparare(def) {}
 
 void Entitate::primesteDamage(int dmg) {
     int damageReal = dmg - aparare;

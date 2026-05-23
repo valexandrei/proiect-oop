@@ -9,17 +9,25 @@ private:
     int xpReward;
 
 protected:
-    void afisareImpl(std::ostream& os) const override;
+    void afisareImpl(std::ostream& os) const override {
+        os << static_cast<const Entitate&>(*this)
+           << " [Inamic | XP: " << xpReward << "]";
+    }
 
 public:
-    Inamic(const std::string& n, Pozitie p, int health, int xpRew = 30);
+    Inamic(const std::string& n, Pozitie p, int health, int xp = 20);
 
     void actioneaza() override;
-    int calculeazaDamage() const override;
-    Inamic* clone() const override;
+    [[nodiscard]] int calculeazaDamage() const override { return getAtac(); }
+    [[nodiscard]] Inamic* clone() const override { return new Inamic(*this); }
 
     void ataca(Entitate& tinta) const;
     int getXPReward() const { return xpReward; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Inamic& i) {
+        i.afisareImpl(os);
+        return os;
+    }
 };
 
 #endif

@@ -9,26 +9,25 @@ Fantoma* Fantoma::clone() const {
 }
 
 void Fantoma::actioneaza() {
-    std::cout << "[Fantoma] " << nume
-              << " pluteste amenintator la " << pos
+    std::cout << "[Fantoma] " << getNume()
+              << " pluteste amenintator la " << getPozitie()
               << (eCorporeala ? " [Corporala]" : " [Eterica]") << ".\n";
 }
 
 int Fantoma::calculeazaDamage() const {
-    return eCorporeala ? atac : atac * 2;
+    return eCorporeala ? getAtac() : getAtac() * 2;
 }
 
 void Fantoma::ataculFazic(Entitate& tinta) {
     int dmg = calculeazaDamage();
-    std::cout << "[Fantoma] " << nume
+    std::cout << "[Fantoma] " << getNume()
               << " traverseaza apararea lui " << tinta.getNume()
               << " pentru " << dmg << " damage fazic!\n";
     tinta.primesteDamage(dmg * 2);
 }
 
 void Fantoma::afisareImpl(std::ostream& os) const {
-    os << "[Fantoma] " << nume
-       << " | HP: " << hp << "/" << hpMax
-       << " | Stare: " << (eCorporeala ? "Corporala" : "Eterica")
-       << " | Damage: " << calculeazaDamage();
+    os << static_cast<const Entitate&>(*this)
+       << " [Fantoma | " << (eCorporeala ? "Corporala" : "Eterica")
+       << " | Damage: " << calculeazaDamage() << "]";
 }
