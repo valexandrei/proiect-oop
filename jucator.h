@@ -49,9 +49,15 @@ public:
 
     void adaugaXP(int xp);
     void crescInNivel();
-    int getNivel() const { return nivel; }
-    int getXP() const { return xpCurent; }
+    int getNivel()    const { return nivel; }
+    int getXP()       const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
+
+    // delegate catre Atribute
+    int  getDex()       const { return attr.getDex(); }
+    int  getStr()       const { return attr.getStr(); }
+    void setDex(int d)        { attr.setDex(d); }
+    void setStr(int s)        { attr.setStr(s); }
 
     friend void swap(Jucator& a, Jucator& b) noexcept;
 

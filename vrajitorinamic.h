@@ -12,8 +12,8 @@ private:
 
 protected:
     void afisareImpl(std::ostream& os) const override {
-        os << static_cast<const Entitate&>(*this)
-           << " [Vrajitor | Mana: " << manaCurenta << "/" << manaMax
+        Entitate::afisareImpl(os);
+        os << " [Vrajitor | Mana: " << manaCurenta << "/" << manaMax
            << " | Damage magie: " << calculeazaDamage() << "]";
     }
 

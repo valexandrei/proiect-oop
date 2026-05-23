@@ -368,6 +368,10 @@ static void initLogica(JocDungeon& joc, Inventar& rucsac) {
     for (const auto& tip : GameData::getTipuriInamici())
         std::cout << "  - " << tip << "\n";
     std::cout << "\n";
+    std::cout << "Aparare jucator: " << joc.getJucator().getAparare() << "\n";
+    std::cout << "DEX jucator: " << joc.getJucator().getDex() << "\n";
+    joc.getJucator().setStr(10);
+    joc.getJucator().setDex(10);
     try {
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion of Healing", 30, 50));
         rucsac.adaugaObiect(std::make_unique<Sabie>(50, 30));
@@ -456,12 +460,10 @@ int main() {
     if (std::getenv("GITHUB_ACTIONS") != nullptr) {
         joc.ruleazaTurEntitati();
         joc.afiseazaStatisticiEntitati(std::cout);
-
         for (const auto& e : joc.getEntitati()) {
             e->afiseaza(std::cout);
             std::cout << "\n";
         }
-
         for (const auto& e : joc.getEntitati()) {
             if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
                 std::cout << f->getNume()
@@ -469,7 +471,6 @@ int main() {
                           << "\n";
             }
         }
-
         std::vector<Inamic*> inamiciRaw;
         for (const auto& e : joc.getEntitati()) {
             if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
@@ -477,7 +478,6 @@ int main() {
         }
         joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
         radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
-
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
         return 0;

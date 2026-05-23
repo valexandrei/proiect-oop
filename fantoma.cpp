@@ -27,7 +27,7 @@ void Fantoma::ataculFazic(Entitate& tinta) {
 }
 
 void Fantoma::afisareImpl(std::ostream& os) const {
-    os << static_cast<const Entitate&>(*this)
-       << " [Fantoma | " << (eCorporeala ? "Corporala" : "Eterica")
+    Entitate::afisareImpl(os);
+    os << " [Fantoma | " << (eCorporeala ? "Corporala" : "Eterica")
        << " | Damage: " << calculeazaDamage() << "]";
 }

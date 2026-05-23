@@ -61,7 +61,6 @@ void Jucator::adaugaXP(int xp) {
 }
 
 void Jucator::afisareImpl(std::ostream& os) const {
-    os << static_cast<const Entitate&>(*this)
-       << " | Nivel: " << nivel
-       << " | " << attr;
+    Entitate::afisareImpl(os);
+    os << " | Nivel: " << nivel << " | " << attr;
 }

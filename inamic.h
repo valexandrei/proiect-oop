@@ -10,8 +10,8 @@ private:
 
 protected:
     void afisareImpl(std::ostream& os) const override {
-        os << static_cast<const Entitate&>(*this)
-           << " [Inamic | XP: " << xpReward << "]";
+        Entitate::afisareImpl(os);
+        os << " [Inamic | XP: " << xpReward << "]";
     }
 
 public:
@@ -22,7 +22,7 @@ public:
     [[nodiscard]] Inamic* clone() const override { return new Inamic(*this); }
 
     void ataca(Entitate& tinta) const;
-    int getXPReward() const { return xpReward; }
+    [[nodiscard]] int getXPReward() const { return xpReward; }
 
     friend std::ostream& operator<<(std::ostream& os, const Inamic& i) {
         i.afisareImpl(os);
