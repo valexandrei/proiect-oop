@@ -120,19 +120,16 @@ static void drawBar(sf::RenderWindow& window,
     bgShape.setFillColor(bg);
     bgShape.setPosition(x, y);
     window.draw(bgShape);
-
     sf::RectangleShape fgShape({w * std::max(0.f, ratio), h});
     fgShape.setFillColor(fg);
     fgShape.setPosition(x, y);
     window.draw(fgShape);
-
     sf::RectangleShape border({w, h});
     border.setFillColor(sf::Color::Transparent);
     border.setOutlineColor(sf::Color(200, 200, 200, 180));
     border.setOutlineThickness(1.5f);
     border.setPosition(x, y);
     window.draw(border);
-
     sf::Text txt;
     txt.setFont(font);
     txt.setCharacterSize(13);
@@ -150,20 +147,15 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font,
     constexpr float barW = 240.f;
     constexpr float barH = 22.f;
     float y = 14.f;
-
     float hpRatio = static_cast<float>(j.getHP()) / static_cast<float>(j.getHPMax());
     drawBar(window, x, y, barW, barH, hpRatio,
             hpColor(hpRatio), sf::Color(60, 0, 0),
-            "HP: " + std::to_string(j.getHP()) + " / " + std::to_string(j.getHPMax()),
-            font);
-
+            "HP: " + std::to_string(j.getHP()) + " / " + std::to_string(j.getHPMax()), font);
     y += barH + 8.f;
     float xpRatio = static_cast<float>(j.getXP()) / static_cast<float>(j.getXPNecesar());
     drawBar(window, x, y, barW, barH, xpRatio,
             sf::Color(30, 160, 220), sf::Color(0, 40, 70),
-            "XP: " + std::to_string(j.getXP()) + " / " + std::to_string(j.getXPNecesar()),
-            font);
-
+            "XP: " + std::to_string(j.getXP()) + " / " + std::to_string(j.getXPNecesar()), font);
     y += barH + 10.f;
     sf::Text nameText;
     nameText.setFont(font);
@@ -174,7 +166,6 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font,
     nameText.setString(j.getNume() + "  Niv." + std::to_string(j.getNivel()));
     nameText.setPosition(x, y);
     window.draw(nameText);
-
     y += 22.f;
     std::string nivelStr = (nivelCurent < 4)
         ? "Etaj " + std::to_string(nivelCurent) + " / 3  [D = usa spre urmatorul etaj]"
@@ -188,7 +179,6 @@ static void drawUI(sf::RenderWindow& window, const sf::Font& font,
     nivelText.setString(nivelStr);
     nivelText.setPosition(x, y);
     window.draw(nivelText);
-
     if (!radarInfo.empty()) {
         y += 22.f;
         sf::Text radarText;
@@ -245,14 +235,12 @@ static void drawDoor(sf::RenderWindow& window, sf::Sprite& sprite,
     int sx = usa.getY() * TILE_SCALED - camX;
     int sy = usa.getX() * TILE_SCALED - camY;
     if (sx < -TILE_SCALED || sx > SCREEN_W || sy < -TILE_SCALED || sy > SCREEN_H) return;
-
     sf::RectangleShape glow({static_cast<float>(TILE_SCALED + 8),
                              static_cast<float>(TILE_SCALED + 8)});
     float pulse = 0.5f + 0.5f * std::sin(time * 3.f);
     glow.setFillColor(sf::Color(100, 200, 255, static_cast<sf::Uint8>(60 + 60 * pulse)));
     glow.setPosition(static_cast<float>(sx - 4), static_cast<float>(sy - 4));
     window.draw(glow);
-
     drawTile(window, sprite, tex, TC_DOOR, sx, sy);
 }
 
@@ -270,31 +258,25 @@ static void procesezaCombatLocal(JocDungeon& joc,
     Jucator& jucator = joc.getJucator();
     Pozitie jPos = jucator.getPozitie();
     bool atacatCeva = false;
-
     for (const auto& e : joc.getEntitati()) {
         if (!e->esteViu()) continue;
         if (!suntAdiacente(jPos, e->getPozitie())) continue;
         atacatCeva = true;
-
         int dmgDat = jucator.calculeazaDamage();
         e->primesteDamage(dmgDat);
-
         std::string descriere = BattleLog::genereazaDescriereLupta(
             jucator.getNume(), e->getNume(), dmgDat);
         BattleLog::adaugaEveniment(descriere);
         logLinii.push_back(descriere);
-
         spawnFloatText(floats, font,
                        "-" + std::to_string(dmgDat),
                        static_cast<float>(e->getPozitie().getY()),
                        static_cast<float>(e->getPozitie().getX()),
                        sf::Color(255, 80, 80));
-
         if (!e->esteViu()) {
             std::string evMoarte = e->getNume() + " a fost eliminat!";
             BattleLog::adaugaEveniment(evMoarte);
             logLinii.push_back(evMoarte);
-
             if (const Inamic* in = dynamic_cast<const Inamic*>(e.get())) {
                 jucator.adaugaXP(in->getXPReward());
                 spawnFloatText(floats, font,
@@ -312,21 +294,17 @@ static void procesezaCombatLocal(JocDungeon& joc,
             }
             continue;
         }
-
         int dmgPrimit = e->calculeazaDamage();
         jucator.primesteDamage(dmgPrimit);
-
         std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
         BattleLog::adaugaEveniment(evContra);
         logLinii.push_back(evContra);
         logLinii.push_back(GameData::getDescriereInamic(e->getNume()));
-
         spawnFloatText(floats, font,
                        "-" + std::to_string(dmgPrimit),
                        static_cast<float>(jPos.getY()),
                        static_cast<float>(jPos.getX()),
                        sf::Color(255, 60, 60));
-
         std::ostringstream oss;
         e->afiseaza(oss);
         if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
@@ -334,7 +312,6 @@ static void procesezaCombatLocal(JocDungeon& joc,
                 (f->esteCorporeala() ? " [corp]" : " [incorp]"));
         }
     }
-
     if (!atacatCeva) {
         BattleLog::adaugaEveniment(jucator.getNume() + " loveste in gol.");
         logLinii.push_back(jucator.getNume() + " loveste in gol.");
@@ -368,20 +345,16 @@ static void treceLaNivelUrmator(JocDungeon& joc, int& nivelCurent,
     nivelCurent++;
     joc.getLabirint().genereazaRandom();
     joc.getJucator().setPozitie(Pozitie(1, 1));
-
     while (!joc.getEntitati().empty()) {
         const_cast<std::vector<std::unique_ptr<Entitate>>&>(joc.getEntitati()).clear();
         break;
     }
-
     populeazaNivel(joc, nivelCurent);
-
     std::string msg;
     if (nivelCurent < 4)
         msg = "Ai ajuns la etajul " + std::to_string(nivelCurent) + "!";
     else
         msg = "CAMERA BOSSULUI! Invinge Lordul Intunericului!";
-
     logLinii.push_back(msg);
     BattleLog::adaugaEveniment(msg);
     message = msg;
@@ -390,13 +363,11 @@ static void treceLaNivelUrmator(JocDungeon& joc, int& nivelCurent,
 
 static void initLogica(JocDungeon& joc, Inventar& rucsac) {
     joc.initSesiune();
-
     std::cout << GameData::getPovesteFundal() << "\n\n";
     std::cout << "Inamici in dungeon:\n";
     for (const auto& tip : GameData::getTipuriInamici())
         std::cout << "  - " << tip << "\n";
     std::cout << "\n";
-
     try {
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion of Healing", 30, 50));
         rucsac.adaugaObiect(std::make_unique<Sabie>(50, 30));
@@ -406,17 +377,13 @@ static void initLogica(JocDungeon& joc, Inventar& rucsac) {
         rucsac.adaugaObiect(std::move(pistolNou));
         rucsac.adaugaObiect(std::make_unique<Potiune>("Potion mica", 15, 30));
     } catch (const InventarException&) {}
-
     rucsac.afiseazaTot();
     rucsac.folosesteToate();
-
     BattleLog::adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
-
     Celula tmp(true);
     tmp.seteazaPerete(false);
     tmp.toggle();
     BattleLog::adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
-
     std::cout << "Sesiuni create: " << JocDungeon::getSesiuniCreate() << "\n";
 }
 
@@ -425,27 +392,23 @@ static void drawEndScreen(sf::RenderWindow& window, const sf::Font& font,
     sf::RectangleShape overlay({static_cast<float>(SCREEN_W), static_cast<float>(SCREEN_H)});
     overlay.setFillColor(sf::Color(0, 0, 0, won ? 160 : 200));
     window.draw(overlay);
-
     sf::Text titleText;
     titleText.setFont(font);
     titleText.setCharacterSize(56);
     titleText.setOutlineColor(sf::Color::Black);
     titleText.setOutlineThickness(4.f);
-
     sf::Text subText;
     subText.setFont(font);
     subText.setCharacterSize(22);
     subText.setFillColor(sf::Color(200, 200, 200));
     subText.setOutlineColor(sf::Color::Black);
     subText.setOutlineThickness(2.f);
-
     sf::Text statsText;
     statsText.setFont(font);
     statsText.setCharacterSize(16);
     statsText.setFillColor(sf::Color(180, 180, 180));
     statsText.setOutlineColor(sf::Color::Black);
     statsText.setOutlineThickness(1.5f);
-
     if (won) {
         titleText.setFillColor(sf::Color(255, 215, 0));
         titleText.setString("VICTORIE!");
@@ -455,21 +418,17 @@ static void drawEndScreen(sf::RenderWindow& window, const sf::Font& font,
         titleText.setString("AI MURIT.");
         subText.setString("Dungeon-ul te-a invins.\nApasa ESC pentru a iesi.");
     }
-
     statsText.setString(
         "Nivel atins: " + std::to_string(nivelCurent) + " / 4" +
         "     Nivel jucator: " + std::to_string(j.getNivel()) +
         "     HP ramas: " + std::to_string(std::max(0, j.getHP())) + " / " + std::to_string(j.getHPMax())
     );
-
     sf::FloatRect tb = titleText.getLocalBounds();
     titleText.setPosition((SCREEN_W - tb.width) / 2.f, SCREEN_H / 2.f - 90.f);
     window.draw(titleText);
-
     sf::FloatRect sb = subText.getLocalBounds();
     subText.setPosition((SCREEN_W - sb.width) / 2.f, SCREEN_H / 2.f + 10.f);
     window.draw(subText);
-
     sf::FloatRect stb = statsText.getLocalBounds();
     statsText.setPosition((SCREEN_W - stb.width) / 2.f, SCREEN_H / 2.f + 80.f);
     window.draw(statsText);
@@ -492,12 +451,6 @@ int main() {
     for (const auto& e : joc.getEntitati()) {
         if (Fantoma* f = dynamic_cast<Fantoma*>(e.get()))
             f->schimbaStare();
-    }
-
-    {
-        Pozitie startPos = joc.getJucator().getPozitie();
-        const Celula& startCelula = joc.getLabirint().getCelula(startPos.getX(), startPos.getY());
-        BattleLog::adaugaEveniment("Start pe: " + std::string(1, startCelula.getSimbol()));
     }
 
     if (std::getenv("GITHUB_ACTIONS") != nullptr) {
@@ -528,6 +481,14 @@ int main() {
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
         return 0;
+    }
+
+    {
+        Pozitie startPos = joc.getJucator().getPozitie();
+        const Celula& startCelula = joc.getLabirint().getCelula(
+            startPos.getX(), startPos.getY());
+        BattleLog::adaugaEveniment("Start pe: " +
+            std::string(1, startCelula.getSimbol()));
     }
 
     sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H), "Dungeon Crawler", sf::Style::Fullscreen);
@@ -565,7 +526,6 @@ int main() {
     while (window.isOpen()) {
         float dt = deltaClock.restart().asSeconds();
         float totalTime = gameClock.getElapsedTime().asSeconds();
-
         const Labirint& lab = joc.getLabirint();
         int labLinii   = lab.getLinii();
         int labColoane = lab.getColoane();
@@ -587,7 +547,6 @@ int main() {
                 joc.procesezaFantome(joc.getJucator());
                 message = "Atac!";
                 msgClock.restart();
-
                 if (!joc.getJucator().esteViu()) {
                     gameDead = true;
                 } else if (nivelCurent == 4) {
@@ -612,7 +571,6 @@ int main() {
             Jucator& jucator = joc.getJucator();
             Pozitie pos    = jucator.getPozitie();
             Pozitie newPos = pos;
-
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
                 sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
                 newPos.setX(newPos.getX() - 1);
@@ -625,14 +583,12 @@ int main() {
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
                      sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
                 newPos.setY(newPos.getY() + 1);
-
             if (newPos.getX() != pos.getX() || newPos.getY() != pos.getY()) {
                 if (newPos.getX() >= 0 && newPos.getX() < labLinii &&
                     newPos.getY() >= 0 && newPos.getY() < labColoane) {
                     if (!lab.getCelula(newPos.getX(), newPos.getY()).estePerete()) {
                         jucator.setPozitie(newPos);
                         joc.verificaInteractiune();
-
                         if (nivelCurent < 4) {
                             Pozitie usa = lab.getPozitieUsa();
                             if (newPos.getX() == usa.getX() && newPos.getY() == usa.getY()) {
@@ -642,7 +598,6 @@ int main() {
                     }
                 }
                 moveClock.restart();
-
                 std::vector<Inamic*> inamiciRaw;
                 for (const auto& e : joc.getEntitati()) {
                     if (!e->esteViu()) continue;
@@ -701,19 +656,15 @@ int main() {
             int sy = ep.getX() * TILE_SCALED - camY;
             if (sx < -TILE_SCALED || sx > SCREEN_W ||
                 sy < -TILE_SCALED || sy > SCREEN_H) continue;
-
             drawTile(window, sprite, tileTex, getTileForEntitate(*e), sx, sy);
-
             constexpr float miniW = static_cast<float>(TILE_SCALED);
             constexpr float miniH = 5.f;
             float ratio = static_cast<float>(e->getHP()) / 100.f;
             ratio = std::min(1.f, std::max(0.f, ratio));
-
             sf::RectangleShape miniBg({miniW, miniH});
             miniBg.setFillColor(sf::Color(80, 0, 0));
             miniBg.setPosition(static_cast<float>(sx), static_cast<float>(sy) - miniH - 2.f);
             window.draw(miniBg);
-
             sf::RectangleShape miniFg({miniW * ratio, miniH});
             miniFg.setFillColor(hpColor(ratio));
             miniFg.setPosition(static_cast<float>(sx), static_cast<float>(sy) - miniH - 2.f);
