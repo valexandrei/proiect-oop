@@ -1,6 +1,54 @@
 # The Minotaur's Lair
 
-The Minotaur's Lair este un joc de tip dungeon crawler scris in C++, in care jucatorul este prins intr-un labirint procedural generat, trebuind sa gaseasca iesirea si sa invinga minotaurul la final. Labirintul este generat cu algoritmul DFS (recursive backtracker), asigurand unicitatea fiecarei sesiuni de joc. Pe parcurs, jucatorul intalneste inamici de dificultate crescatoare, culminand cu confruntarea finala cu Minotaurul.
+**The Minotaur's Lair** este un joc de tip dungeon crawler 2D scris în C++ cu SFML, în care jucătorul explorează un labirint procedural generat, luptă cu inamici de dificultate crescătoare și încearcă să ajungă la confruntarea finală cu Minotaurul.
+
+## Descriere
+
+Labirintul este generat la fiecare sesiune folosind algoritmul DFS (recursive backtracker), asigurând unicitatea fiecărei partide. Jocul se desfășoară pe 3 etaje
+cu dificultate progresivă, urmate de camera boss-ului. Pe fiecare etaj, jucătorul trebuie să găsească ușa spre nivelul următor, reprezentată pe hartă cu `D`.
+
+## Inamici
+
+| Tip | Descriere |
+|-----|-----------|
+| **Goblin** | Inamic de bază, atacuri rapide, HP redus |
+| **Orc** | Inamic rezistent, damage ridicat |
+| **Fantomă** | Poate fi corporală sau incorporală — în stare incorporală ignoră armura și face damage dublu |
+| **Vrăjitor** | Atacă cu magie, damage variabil în funcție de mana disponibilă |
+| **Schelet** | Reînvie o singură dată după ce e omărât, cu jumătate din HP-ul maxim |
+| **Minotaur (Boss)** | Boss final cu HP foarte mare, apare pe etajul 4 |
+
+## Controale
+
+| Tastă | Acțiune |
+|-------|---------|
+| `W` / `↑` | Deplasare sus |
+| `S` / `↓` | Deplasare jos |
+| `A` / `←` | Deplasare stânga |
+| `D` / `→` | Deplasare dreapta |
+| `Space` | Atac — lovește inamicii adiacenți |
+| `L` | Afișează jurnalul de luptă și statistici în consolă |
+| `ESC` | Închide jocul |
+
+## Funcționalități
+
+- Labirint procedural generat cu DFS la fiecare sesiune
+- Pathfinding BFS pentru mișcarea inamicilor
+- Sistem de XP și level-up cu statistici crescătoare
+- Radar care afișează distanța până la cel mai apropiat inamic
+- Jurnal de luptă cu ultimele 6 evenimente
+- Bare de HP și XP vizuale
+- Texte flotante pentru damage și XP câștigat
+- 3 etaje + camera boss-ului
+
+## Compilare
+
+Proiectul folosește CMake și SFML 2.6.2 (descărcat automat prin FetchContent).
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
 
 
 
