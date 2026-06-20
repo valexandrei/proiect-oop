@@ -491,6 +491,7 @@ int main() {
         schelet.actioneaza();
         schelet.primesteDamageSchelet(25);
         schelet.primesteDamageSchelet(20);
+        std::cout << "Poate reinvia: " << (schelet.poateReinvia() ? "da" : "nu") << "\n";
         std::cout << schelet << "\n";
         return 0;
     }
