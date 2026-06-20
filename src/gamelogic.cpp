@@ -154,16 +154,22 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
             }
             continue;
         }
-        int dmgPrimit = e->calculeazaDamage();
-        jucator.primesteDamage(dmgPrimit);
-        std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
-        BattleLog::adaugaEveniment(evContra);
-        logLinii.push_back(evContra);
-        logLinii.push_back(GameData::getDescriereInamic(e->getNume()));
-        renderer.spawnFloatText(floats, "-" + std::to_string(dmgPrimit),
-                                static_cast<float>(jPos.getY()),
-                                static_cast<float>(jPos.getX()),
-                                sf::Color(255, 60, 60));
+        if (VrajitorInamic* vraj = dynamic_cast<VrajitorInamic*>(e.get())) {
+            vraj->aruncaVraja(jucator);
+        } else if (Fantoma* f = dynamic_cast<Fantoma*>(e.get())) {
+            f->ataculFazic(jucator);
+        } else {
+            int dmgPrimit = e->calculeazaDamage();
+            jucator.primesteDamage(dmgPrimit);
+            std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
+            BattleLog::adaugaEveniment(evContra);
+            logLinii.push_back(evContra);
+            logLinii.push_back(GameData::getDescriereInamic(e->getNume()));
+            renderer.spawnFloatText(floats, "-" + std::to_string(dmgPrimit),
+                                    static_cast<float>(jPos.getY()),
+                                    static_cast<float>(jPos.getX()),
+                                    sf::Color(255, 60, 60));
+        }
         std::ostringstream oss;
         e->afiseaza(oss);
         if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
