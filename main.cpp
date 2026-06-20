@@ -18,6 +18,7 @@
 #include "battlelog.h"
 #include "gamedata.h"
 #include "radar.h"
+#include "schelet.h"
 
 static constexpr int TILE_SIZE   = 16;
 static constexpr int SCALE       = 3;
@@ -328,6 +329,7 @@ static void populeazaNivel(JocDungeon& joc, int nivelCurent) {
         joc.adaugaEntitate(std::make_unique<Inamic>("Orc Berserker",      Pozitie(6, 10), 90, 35));
         joc.adaugaEntitate(std::make_unique<VrajitorInamic>("Vrajitor Umbra", Pozitie(10, 5), 45, 25));
         joc.adaugaEntitate(std::make_unique<Fantoma>("Fantoma Razbunarii", Pozitie(12, 12), 50));
+        joc.adaugaEntitate(std::make_unique<Schelet>("Schelet Antic", Pozitie(8, 8), 30, 12));
     } else if (nivelCurent == 3) {
         joc.adaugaEntitate(std::make_unique<Inamic>("Goblin Elita",       Pozitie(3, 5),  70, 25));
         joc.adaugaEntitate(std::make_unique<Inamic>("Orc Campion",        Pozitie(7, 9), 110, 40));
@@ -485,6 +487,11 @@ int main() {
         } catch (const PozitieInvalidaException& e) {
             std::cout << "[Exceptie prinsa]: " << e.what() << "\n";
         }
+        Schelet schelet("Schelet Test", Pozitie(5, 5), 30, 12);
+        schelet.actioneaza();
+        schelet.primesteDamageSchelet(25);
+        schelet.primesteDamageSchelet(20);
+        std::cout << schelet << "\n";
         return 0;
     }
 

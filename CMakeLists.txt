@@ -57,6 +57,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/radar.cpp
         src/fantoma.cpp
         src/vrajitorinamic.cpp
+        src/schelet.cpp
+        include/schelet.h
         include/pozitie.h
         include/celula.h
         include/labirint.h
