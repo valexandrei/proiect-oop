@@ -41,15 +41,6 @@ cu dificultate progresivă, urmate de camera boss-ului. Pe fiecare etaj, jucăto
 - Texte flotante pentru damage și XP câștigat
 - 3 etaje + camera boss-ului
 
-## Compilare
-
-Proiectul folosește CMake și SFML 2.6.2 (descărcat automat prin FetchContent).
-
-```bash
-cmake -S . -B build
-cmake --build build
-```
-
 
 
 # Cerințe
