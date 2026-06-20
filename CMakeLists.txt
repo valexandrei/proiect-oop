@@ -38,50 +38,45 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(${MAIN_EXECUTABLE_NAME}
         main.cpp
-        pozitie.cpp
-        pozitie.h
-        celula.cpp
-        celula.h
-        labirint.cpp
-        labirint.h
-        jocdungeon.cpp
-        jocdungeon.h
-        entitate.cpp
-        entitate.h
-        jucator.cpp
-        jucator.h
-        inamic.cpp
-        inamic.h
-        obiect.cpp
-        obiect.h
-        potiune.cpp
-        potiune.h
-        inventar.cpp
-        inventar.h
-        arma.cpp
-        arma.h
-        sabie.cpp
-        sabie.h
-        pistoale.cpp
-        pistoale.h
-        spear.cpp
-        spear.h
-        gamedata.cpp
-        gamedata.h
-        battlelog.cpp
-        battlelog.h
-        radar.cpp
-        radar.h
-        exceptii.h
-        fantoma.cpp
-        fantoma.h
-        vrajitorinamic.cpp
-        vrajitorinamic.h
-)
-
-target_sources(${MAIN_EXECUTABLE_NAME}
-        PRIVATE
-        src/Example.cpp
+        src/pozitie.cpp
+        src/celula.cpp
+        src/labirint.cpp
+        src/jocdungeon.cpp
+        src/entitate.cpp
+        src/jucator.cpp
+        src/inamic.cpp
+        src/obiect.cpp
+        src/potiune.cpp
+        src/inventar.cpp
+        src/arma.cpp
+        src/sabie.cpp
+        src/pistoale.cpp
+        src/spear.cpp
+        src/gamedata.cpp
+        src/battlelog.cpp
+        src/radar.cpp
+        src/fantoma.cpp
+        src/vrajitorinamic.cpp
+        include/pozitie.h
+        include/celula.h
+        include/labirint.h
+        include/jocdungeon.h
+        include/entitate.h
+        include/jucator.h
+        include/inamic.h
+        include/obiect.h
+        include/potiune.h
+        include/inventar.h
+        include/arma.h
+        include/sabie.h
+        include/pistoale.h
+        include/spear.h
+        include/gamedata.h
+        include/battlelog.h
+        include/radar.h
+        include/exceptii.h
+        include/fantoma.h
+        include/vrajitorinamic.h
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})
