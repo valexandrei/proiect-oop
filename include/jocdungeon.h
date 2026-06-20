@@ -26,8 +26,6 @@ public:
     void ruleazaTurEntitati();
     void afiseazaStatisticiEntitati(std::ostream& os) const;
     void procesezaCombat(Jucator& jucator);
-    void procesezaVrajitori(Jucator& jucator);
-    void procesezaFantome(Jucator& jucator);
     void adaugaEntitate(std::unique_ptr<Entitate> e);
 
     Jucator& getJucator() { return jucator; }

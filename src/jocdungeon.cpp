@@ -69,24 +69,6 @@ void JocDungeon::procesezaCombat(Jucator& juc) {
     }
 }
 
-void JocDungeon::procesezaVrajitori(Jucator& juc) {
-    for (const auto& e : entitati) {
-        if (!e->esteViu()) continue;
-        if (VrajitorInamic* vraj = dynamic_cast<VrajitorInamic*>(e.get())) {
-            vraj->aruncaVraja(juc);
-        }
-    }
-}
-
-void JocDungeon::procesezaFantome(Jucator& juc) {
-    for (const auto& e : entitati) {
-        if (!e->esteViu()) continue;
-        if (Fantoma* fantoma = dynamic_cast<Fantoma*>(e.get())) {
-            fantoma->ataculFazic(juc);
-        }
-    }
-}
-
 void JocDungeon::verificaInteractiune() {
     Pozitie posJucator = jucator.getPozitie();
     for (const auto& e : entitati) {
