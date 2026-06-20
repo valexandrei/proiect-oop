@@ -83,6 +83,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/renderer.cpp
         include/gamelogic.h
         src/gamelogic.cpp
+        include/inamicfactory.h
+        src/inamicfactory.cpp
+        include/stiva.h
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})

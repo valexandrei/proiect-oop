@@ -11,6 +11,7 @@
 #include "schelet.h"
 #include "renderer.h"
 #include "gamelogic.h"
+#include "stiva.h"
 
 int main() {
     JocDungeon joc("Dungeon of Doom", 20, 30);
@@ -52,8 +53,8 @@ int main() {
         }
         joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
         radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
-        BattleLog::afiseazaLog();
-        BattleLog::curataLog();
+        BattleLog::getInstance().afiseazaLog();
+        BattleLog::getInstance().curataLog();
         try {
             [[maybe_unused]] const auto& c = joc.getLabirint().getCelula(-1, -1);
         } catch (const PozitieInvalidaException& e) {
@@ -65,6 +66,18 @@ int main() {
         schelet.primesteDamageSchelet(20);
         std::cout << "Poate reinvia: " << (schelet.poateReinvia() ? "da" : "nu") << "\n";
         std::cout << schelet << "\n";
+        Stiva<int> stivaScoruri(10);
+        stivaScoruri.push(100);
+        stivaScoruri.push(250);
+        stivaScoruri.push(75);
+        stivaScoruri.afiseaza(std::cout);
+        std::cout << "Max scor: " << maximDinStiva(stivaScoruri) << "\n";
+
+        Stiva<std::string> stivaEvenimente(5);
+        stivaEvenimente.push("Goblin eliminat");
+        stivaEvenimente.push("Level up");
+        stivaEvenimente.afiseaza(std::cout);
+        std::cout << "Ultimul eveniment: " << stivaEvenimente.top() << "\n";
         return 0;
     }
 
@@ -72,7 +85,7 @@ int main() {
         Pozitie startPos = joc.getJucator().getPozitie();
         const Celula& startCelula = joc.getLabirint().getCelula(
             startPos.getX(), startPos.getY());
-        BattleLog::adaugaEveniment("Start pe: " +
+        BattleLog::getInstance().adaugaEveniment("Start pe: " +
             std::string(1, startCelula.getSimbol()));
     }
 
@@ -121,7 +134,7 @@ int main() {
             if (event.type == sf::Event::Closed) window.close();
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::Escape) {
-                BattleLog::afiseazaLog();
+                BattleLog::getInstance().afiseazaLog();
                 window.close();
             }
             if (event.type == sf::Event::KeyPressed &&
@@ -145,7 +158,7 @@ int main() {
             }
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::L) {
-                BattleLog::afiseazaLog();
+                BattleLog::getInstance().afiseazaLog();
                 joc.afiseazaStatisticiEntitati(std::cout);
             }
         }

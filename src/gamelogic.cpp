@@ -43,11 +43,11 @@ void GameLogic::initLogica(JocDungeon& joc, Inventar& rucsac) {
     } catch (const InventarException&) {}
     rucsac.afiseazaTot();
     rucsac.folosesteToate();
-    BattleLog::adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
+    BattleLog::getInstance().adaugaEveniment("Sesiune noua inceputa: " + joc.getNume());
     Celula tmp(true);
     tmp.seteazaPerete(false);
     tmp.toggle();
-    BattleLog::adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
+    BattleLog::getInstance().adaugaEveniment("Celula test: " + std::string(1, tmp.getSimbol()));
     std::cout << "Sesiuni create: " << JocDungeon::getSesiuniCreate() << "\n";
 }
 
@@ -85,7 +85,7 @@ void GameLogic::treceLaNivelUrmator(JocDungeon& joc, int& nivelCurent,
         ? "Ai ajuns la etajul " + std::to_string(nivelCurent) + "!"
         : "CAMERA BOSSULUI! Invinge Lordul Intunericului!";
     logLinii.push_back(msg);
-    BattleLog::adaugaEveniment(msg);
+    BattleLog::getInstance().adaugaEveniment(msg);
     message = msg;
     msgClock.restart();
 }
@@ -125,9 +125,9 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
         atacatCeva = true;
         int dmgDat = jucator.calculeazaDamage();
         e->primesteDamage(dmgDat);
-        std::string descriere = BattleLog::genereazaDescriereLupta(
+        std::string descriere = BattleLog::getInstance().genereazaDescriereLupta(
             jucator.getNume(), e->getNume(), dmgDat);
-        BattleLog::adaugaEveniment(descriere);
+        BattleLog::getInstance().adaugaEveniment(descriere);
         logLinii.push_back(descriere);
         renderer.spawnFloatText(floats, "-" + std::to_string(dmgDat),
                                 static_cast<float>(e->getPozitie().getY()),
@@ -135,7 +135,7 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
                                 sf::Color(255, 80, 80));
         if (!e->esteViu()) {
             std::string evMoarte = e->getNume() + " a fost eliminat!";
-            BattleLog::adaugaEveniment(evMoarte);
+            BattleLog::getInstance().adaugaEveniment(evMoarte);
             logLinii.push_back(evMoarte);
             if (const Inamic* in = dynamic_cast<const Inamic*>(e.get())) {
                 jucator.adaugaXP(in->getXPReward());
@@ -147,7 +147,7 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
                 int nivelNou = jucator.getNivel();
                 if (nivelNou > nivelAnterior) {
                     std::string msgLvl = GameData::getMesajLevelUp(nivelNou);
-                    BattleLog::adaugaEveniment(msgLvl);
+                    BattleLog::getInstance().adaugaEveniment(msgLvl);
                     logLinii.push_back(msgLvl);
                     nivelAnterior = nivelNou;
                 }
@@ -162,7 +162,7 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
             int dmgPrimit = e->calculeazaDamage();
             jucator.primesteDamage(dmgPrimit);
             std::string evContra = e->getNume() + " contraataca: -" + std::to_string(dmgPrimit) + " HP";
-            BattleLog::adaugaEveniment(evContra);
+            BattleLog::getInstance().adaugaEveniment(evContra);
             logLinii.push_back(evContra);
             logLinii.push_back(GameData::getDescriereInamic(e->getNume()));
             renderer.spawnFloatText(floats, "-" + std::to_string(dmgPrimit),
@@ -173,12 +173,12 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
         std::ostringstream oss;
         e->afiseaza(oss);
         if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
-            BattleLog::adaugaEveniment(oss.str() +
+            BattleLog::getInstance().adaugaEveniment(oss.str() +
                 (f->esteCorporeala() ? " [corp]" : " [incorp]"));
         }
     }
     if (!atacatCeva) {
-        BattleLog::adaugaEveniment(jucator.getNume() + " loveste in gol.");
+        BattleLog::getInstance().adaugaEveniment(jucator.getNume() + " loveste in gol.");
         logLinii.push_back(jucator.getNume() + " loveste in gol.");
     }
 }
