@@ -481,7 +481,7 @@ int main() {
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
         try {
-            joc.getLabirint().getCelula(-1, -1);
+            [[maybe_unused]] const auto& c = joc.getLabirint().getCelula(-1, -1);
         } catch (const PozitieInvalidaException& e) {
             std::cout << "[Exceptie prinsa]: " << e.what() << "\n";
         }
