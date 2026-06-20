@@ -22,9 +22,9 @@ public:
     void adaugaEveniment(const std::string& eveniment);
     void afiseazaLog() const;
     void curataLog();
-    std::string genereazaDescriereLupta(const std::string& numeJucator,
-                                         const std::string& numeInamic,
-                                         int damage) const;
+    static std::string genereazaDescriereLupta(const std::string& numeJucator,
+                                                const std::string& numeInamic,
+                                                int damage);
 };
 
 #endif

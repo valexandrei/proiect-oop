@@ -21,7 +21,7 @@ void BattleLog::afiseazaLog() const {
 
 std::string BattleLog::genereazaDescriereLupta(const std::string& numeJucator,
                                                  const std::string& numeInamic,
-                                                 int damage) const {
+                                                 int damage) {
     double critic = (damage > 20) ? 1.5 : 1.0;
     int fmg = static_cast<int>(damage * critic);
     std::string s = "Lupta: " + numeJucator + " vs " + numeInamic + ". ";

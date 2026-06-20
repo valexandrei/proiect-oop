@@ -125,8 +125,8 @@ void GameLogic::procesezaCombat(JocDungeon& joc,
         atacatCeva = true;
         int dmgDat = jucator.calculeazaDamage();
         e->primesteDamage(dmgDat);
-        std::string descriere = BattleLog::getInstance().genereazaDescriereLupta(
-            jucator.getNume(), e->getNume(), dmgDat);
+        std::string descriere = BattleLog::genereazaDescriereLupta(
+     jucator.getNume(), e->getNume(), dmgDat);
         BattleLog::getInstance().adaugaEveniment(descriere);
         logLinii.push_back(descriere);
         renderer.spawnFloatText(floats, "-" + std::to_string(dmgDat),
