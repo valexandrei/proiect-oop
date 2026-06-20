@@ -79,6 +79,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/exceptii.h
         include/fantoma.h
         include/vrajitorinamic.h
+        include/renderer.h
+        src/renderer.cpp
+        include/gamelogic.h
+        src/gamelogic.cpp
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})
