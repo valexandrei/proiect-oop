@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "gamelogic.h"
 #include "stiva.h"
+#include "inamicfactory.h"
 
 int main() {
     JocDungeon joc("Dungeon of Doom", 20, 30);
@@ -66,18 +67,30 @@ int main() {
         schelet.primesteDamageSchelet(20);
         std::cout << "Poate reinvia: " << (schelet.poateReinvia() ? "da" : "nu") << "\n";
         std::cout << schelet << "\n";
+
         Stiva<int> stivaScoruri(10);
         stivaScoruri.push(100);
         stivaScoruri.push(250);
         stivaScoruri.push(75);
         stivaScoruri.afiseaza(std::cout);
-        std::cout << "Max scor: " << maximDinStiva(stivaScoruri) << "\n";
+        std::cout << "Marime stiva: " << stivaScoruri.marime() << "\n";
+        try {
+            std::cout << "Max scor: " << maximDinStiva(stivaScoruri) << "\n";
+        } catch (const std::exception& e) {
+            std::cout << "[Exceptie]: " << e.what() << "\n";
+        }
 
         Stiva<std::string> stivaEvenimente(5);
         stivaEvenimente.push("Goblin eliminat");
         stivaEvenimente.push("Level up");
         stivaEvenimente.afiseaza(std::cout);
         std::cout << "Ultimul eveniment: " << stivaEvenimente.top() << "\n";
+
+        auto inamicTest = InamicFactory::creeaza(InamicFactory::Tip::Goblin,
+            "Goblin Test", Pozitie(1, 1), 30, 10);
+        inamicTest->afiseaza(std::cout);
+        std::cout << "Nume implicit: " << InamicFactory::numeImplicit(InamicFactory::Tip::Orc) << "\n";
+
         return 0;
     }
 
