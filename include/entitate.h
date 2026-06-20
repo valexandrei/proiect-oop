@@ -6,7 +6,7 @@
 #include "pozitie.h"
 
 class Entitate {
-protected:
+private:
     std::string nume;
     Pozitie pos;
     int hp;

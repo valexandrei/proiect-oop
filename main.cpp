@@ -7,13 +7,13 @@
 #include "jocdungeon.h"
 #include "jucator.h"
 #include "inamic.h"
-#include "include/vrajitorinamic.h"
+#include "vrajitorinamic.h"
 #include "fantoma.h"
 #include "inventar.h"
 #include "exceptii.h"
 #include "pistoale.h"
 #include "sabie.h"
-#include "include/spear.h"
+#include "spear.h"
 #include "potiune.h"
 #include "battlelog.h"
 #include "gamedata.h"
@@ -480,6 +480,11 @@ int main() {
         radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
         BattleLog::afiseazaLog();
         BattleLog::curataLog();
+        try {
+            joc.getLabirint().getCelula(-1, -1);
+        } catch (const PozitieInvalidaException& e) {
+            std::cout << "[Exceptie prinsa]: " << e.what() << "\n";
+        }
         return 0;
     }
 

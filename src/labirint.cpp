@@ -107,6 +107,17 @@ Pozitie Labirint::urmatoarePozitie(const Pozitie& from, const Pozitie& to) const
     }
     return cur;
 }
+const Celula& Labirint::getCelula(int r, int c) const {
+    if (r < 0 || r >= linii || c < 0 || c >= coloane)
+        throw PozitieInvalidaException(r, c);
+    return grid[r][c];
+}
+
+Celula& Labirint::getCelula(int r, int c) {
+    if (r < 0 || r >= linii || c < 0 || c >= coloane)
+        throw PozitieInvalidaException(r, c);
+    return grid[r][c];
+}
 
 void Labirint::afisareGrafica(const Pozitie& posJucator, const std::vector<Inamic*>& inamici) const {
     for (int r = 0; r < linii; ++r) {

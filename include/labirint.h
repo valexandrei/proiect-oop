@@ -4,6 +4,7 @@
 #include "celula.h"
 #include "pozitie.h"
 #include "inamic.h"
+#include "exceptii.h"
 
 class Labirint {
 public:
@@ -19,11 +20,10 @@ public:
 
     [[nodiscard]] int getLinii() const { return linii; }
     [[nodiscard]] int getColoane() const { return coloane; }
-    [[nodiscard]] const Celula& getCelula(int r, int c) const { return grid[r][c]; }
-    [[nodiscard]] Celula& getCelula(int r, int c) { return grid[r][c]; }
+    [[nodiscard]] const Celula& getCelula(int r, int c) const;
+    [[nodiscard]] Celula& getCelula(int r, int c);
 
     [[nodiscard]] Pozitie urmatoarePozitie(const Pozitie& from, const Pozitie& to) const;
-
     [[nodiscard]] Pozitie getPozitieUsa() const { return pozitieUsa; }
 
 private:
