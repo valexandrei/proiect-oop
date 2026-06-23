@@ -166,6 +166,8 @@ void GameLogic::ruleazaTesteCLI(JocDungeon& joc, Radar& radar) {
     const Stiva<Pozitie>& istoric = joc.getIstoricPozitii();
     std::cout << "Istoric pozitii jucator (marime " << istoric.marime() << "):\n";
     istoric.afiseaza(std::cout);
+    if (!istoric.esteGoala())
+        std::cout << "Ultima pozitie inregistrata: " << istoric.top() << "\n";
 
     Stiva<int> scoruri(10);
     scoruri.push(100);

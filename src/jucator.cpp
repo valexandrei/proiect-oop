@@ -40,7 +40,7 @@ void Jucator::actioneaza() {
 }
 
 int Jucator::calculeazaDamage() const {
-    return getAtac() + attr.getStr() / 2;
+    return getAtac() + attr.getStr() / 2 + attr.getDex() / 4;
 }
 
 void Jucator::crescInNivel() {
