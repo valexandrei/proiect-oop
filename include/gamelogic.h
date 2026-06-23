@@ -23,7 +23,7 @@ public:
                                  int& nivelAnterior);
     static void miseazaInamici(JocDungeon& joc);
     static bool suntAdiacente(const Pozitie& a, const Pozitie& b);
-    static void ruleazaTesteCLI(JocDungeon& joc, Radar& radar);
+    static void ruleazaTesteCLI(JocDungeon& joc, const Radar& radar);
 };
 
 #endif

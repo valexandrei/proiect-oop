@@ -123,7 +123,7 @@ void GameLogic::miseazaInamici(JocDungeon& joc) {
     }
 }
 
-void GameLogic::ruleazaTesteCLI(JocDungeon& joc, Radar& radar) {
+void GameLogic::ruleazaTesteCLI(JocDungeon& joc, const Radar& radar) {
     joc.ruleazaTurEntitati();
     joc.afiseazaStatisticiEntitati(std::cout);
 
