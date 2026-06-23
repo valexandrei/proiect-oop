@@ -23,8 +23,7 @@ public:
     int calculeazaDamage() const override { return dmgOase; }
     Schelet* clone() const override { return new Schelet(*this); }
 
-    void primesteDamageSchelet(int dmg);
-    bool poateReinvia() const { return !aReinviat; }
+    bool incearcaReinviere() override;
 
     friend std::ostream& operator<<(std::ostream& os, const Schelet& s) {
         s.afisareImpl(os);

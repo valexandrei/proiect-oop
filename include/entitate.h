@@ -23,6 +23,7 @@ public:
     virtual void actioneaza() = 0;
     virtual int calculeazaDamage() const = 0;
     virtual Entitate* clone() const = 0;
+    virtual bool incearcaReinviere() { return false; }
 
     Pozitie getPozitie()          const { return pos; }
     void    setPozitie(Pozitie p)       { pos = p; }
@@ -30,7 +31,6 @@ public:
     int  getHP()                  const { return hp; }
     int  getHPMax()               const { return hpMax; }
     int  getAtac()                const { return atac; }
-    int  getAparare()             const { return aparare; }
     bool esteViu()                const { return hp > 0; }
 
     void setHP(int val)    { hp    = val; }

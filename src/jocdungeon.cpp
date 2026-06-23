@@ -7,14 +7,16 @@ int JocDungeon::sesiuniCreate = 0;
 JocDungeon::JocDungeon(std::string nume, int l, int c)
     : numeSesiune(std::move(nume)),
       jucator("Erou", Pozitie(1, 1)),
-      labirint(l, c) {
+      labirint(l, c),
+      istoricPozitii(200) {
     ++sesiuniCreate;
 }
 
 JocDungeon::JocDungeon(const JocDungeon& other)
     : numeSesiune(other.numeSesiune),
       jucator(other.jucator),
-      labirint(other.labirint) {
+      labirint(other.labirint),
+      istoricPozitii(other.istoricPozitii) {
     for (const auto& e : other.entitati) {
         entitati.push_back(std::unique_ptr<Entitate>(e->clone()));
     }
@@ -27,6 +29,7 @@ void swap(JocDungeon& a, JocDungeon& b) noexcept {
     swap(a.jucator, b.jucator);
     swap(a.labirint, b.labirint);
     swap(a.entitati, b.entitati);
+    swap(a.istoricPozitii, b.istoricPozitii);
 }
 
 JocDungeon& JocDungeon::operator=(JocDungeon other) {
@@ -41,6 +44,11 @@ void JocDungeon::initSesiune() {
 
 void JocDungeon::adaugaEntitate(std::unique_ptr<Entitate> e) {
     entitati.push_back(std::move(e));
+}
+
+void JocDungeon::inregistreazaPozitie(const Pozitie& p) {
+    if (istoricPozitii.marime() < 200)
+        istoricPozitii.push(p);
 }
 
 void JocDungeon::ruleazaTurEntitati() {

@@ -9,12 +9,11 @@ void Schelet::actioneaza() {
               << " zornaire oasele la " << getPozitie() << ".\n";
 }
 
-void Schelet::primesteDamageSchelet(int dmg) {
-    primesteDamage(dmg);
-    if (!esteViu() && !aReinviat) {
+bool Schelet::incearcaReinviere() {
+    if (!aReinviat) {
         aReinviat = true;
         setHP(getHPMax() / 2);
-        std::cout << "[Schelet] " << getNume()
-                  << " reInvie cu " << getHP() << " HP!\n";
+        return true;
     }
+    return false;
 }

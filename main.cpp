@@ -34,63 +34,7 @@ int main() {
     }
 
     if (std::getenv("GITHUB_ACTIONS") != nullptr) {
-        joc.ruleazaTurEntitati();
-        joc.afiseazaStatisticiEntitati(std::cout);
-        for (const auto& e : joc.getEntitati()) {
-            e->afiseaza(std::cout);
-            std::cout << "\n";
-        }
-        for (const auto& e : joc.getEntitati()) {
-            if (const Fantoma* f = dynamic_cast<const Fantoma*>(e.get())) {
-                std::cout << f->getNume()
-                          << (f->esteCorporeala() ? " [corporala]" : " [incorporala]")
-                          << "\n";
-            }
-        }
-        std::vector<Inamic*> inamiciRaw;
-        for (const auto& e : joc.getEntitati()) {
-            if (Inamic* in = dynamic_cast<Inamic*>(e.get()))
-                inamiciRaw.push_back(in);
-        }
-        joc.getLabirint().afisareGrafica(joc.getJucator().getPozitie(), inamiciRaw);
-        radar.afiseazaRadar(joc.getJucator().getPozitie(), inamiciRaw);
-        BattleLog::getInstance().afiseazaLog();
-        BattleLog::getInstance().curataLog();
-        try {
-            [[maybe_unused]] const auto& c = joc.getLabirint().getCelula(-1, -1);
-        } catch (const PozitieInvalidaException& e) {
-            std::cout << "[Exceptie prinsa]: " << e.what() << "\n";
-        }
-        Schelet schelet("Schelet Test", Pozitie(5, 5), 30, 12);
-        schelet.actioneaza();
-        schelet.primesteDamageSchelet(25);
-        schelet.primesteDamageSchelet(20);
-        std::cout << "Poate reinvia: " << (schelet.poateReinvia() ? "da" : "nu") << "\n";
-        std::cout << schelet << "\n";
-
-        Stiva<int> stivaScoruri(10);
-        stivaScoruri.push(100);
-        stivaScoruri.push(250);
-        stivaScoruri.push(75);
-        stivaScoruri.afiseaza(std::cout);
-        std::cout << "Marime stiva: " << stivaScoruri.marime() << "\n";
-        try {
-            std::cout << "Max scor: " << maximDinStiva(stivaScoruri) << "\n";
-        } catch (const std::exception& e) {
-            std::cout << "[Exceptie]: " << e.what() << "\n";
-        }
-
-        Stiva<std::string> stivaEvenimente(5);
-        stivaEvenimente.push("Goblin eliminat");
-        stivaEvenimente.push("Level up");
-        stivaEvenimente.afiseaza(std::cout);
-        std::cout << "Ultimul eveniment: " << stivaEvenimente.top() << "\n";
-
-        auto inamicTest = InamicFactory::creeaza(InamicFactory::Tip::Goblin,
-            "Goblin Test", Pozitie(1, 1), 30, 10);
-        inamicTest->afiseaza(std::cout);
-        std::cout << "Nume implicit: " << InamicFactory::numeImplicit(InamicFactory::Tip::Orc) << "\n";
-
+        GameLogic::ruleazaTesteCLI(joc, radar);
         return 0;
     }
 
@@ -197,6 +141,7 @@ int main() {
                     newPos.getY() >= 0 && newPos.getY() < labColoane) {
                     if (!lab.getCelula(newPos.getX(), newPos.getY()).estePerete()) {
                         jucator.setPozitie(newPos);
+                        joc.inregistreazaPozitie(newPos);
                         joc.verificaInteractiune();
                         if (nivelCurent < 4) {
                             Pozitie usa = lab.getPozitieUsa();

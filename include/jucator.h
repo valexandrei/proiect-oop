@@ -14,8 +14,6 @@ public:
 
     int getStr() const { return str; }
     int getDex() const { return dex; }
-    void setStr(int s) { str = s; }
-    void setDex(int d) { dex = d; }
 
     friend void swap(Atribute& a, Atribute& b) noexcept {
         using std::swap;
@@ -52,12 +50,6 @@ public:
     int getNivel()    const { return nivel; }
     int getXP()       const { return xpCurent; }
     int getXPNecesar() const { return xpNecesar; }
-
-    // delegate catre Atribute
-    int  getDex()       const { return attr.getDex(); }
-    int  getStr()       const { return attr.getStr(); }
-    void setDex(int d)        { attr.setDex(d); }
-    void setStr(int s)        { attr.setStr(s); }
 
     friend void swap(Jucator& a, Jucator& b) noexcept;
 

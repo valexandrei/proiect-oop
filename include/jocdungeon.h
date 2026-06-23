@@ -10,6 +10,8 @@
 #include "labirint.h"
 #include "inventar.h"
 #include "battlelog.h"
+#include "stiva.h"
+#include "pozitie.h"
 
 class JocDungeon {
 public:
@@ -27,6 +29,7 @@ public:
     void afiseazaStatisticiEntitati(std::ostream& os) const;
     void procesezaCombat(Jucator& jucator);
     void adaugaEntitate(std::unique_ptr<Entitate> e);
+    void inregistreazaPozitie(const Pozitie& p);
 
     Jucator& getJucator() { return jucator; }
     const Jucator& getJucator() const { return jucator; }
@@ -34,6 +37,7 @@ public:
     const Labirint& getLabirint() const { return labirint; }
     const std::vector<std::unique_ptr<Entitate>>& getEntitati() const { return entitati; }
     const std::string& getNume() const { return numeSesiune; }
+    const Stiva<Pozitie>& getIstoricPozitii() const { return istoricPozitii; }
 
     static int getSesiuniCreate() { return sesiuniCreate; }
 
@@ -43,5 +47,6 @@ private:
     Labirint labirint;
     Inventar inventar;
     std::vector<std::unique_ptr<Entitate>> entitati;
+    Stiva<Pozitie> istoricPozitii;
     static int sesiuniCreate;
 };

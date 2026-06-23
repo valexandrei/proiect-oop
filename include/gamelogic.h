@@ -7,6 +7,7 @@
 #include "jocdungeon.h"
 #include "inventar.h"
 #include "renderer.h"
+#include "radar.h"
 
 class GameLogic {
 public:
@@ -22,6 +23,7 @@ public:
                                  int& nivelAnterior);
     static void miseazaInamici(JocDungeon& joc);
     static bool suntAdiacente(const Pozitie& a, const Pozitie& b);
+    static void ruleazaTesteCLI(JocDungeon& joc, Radar& radar);
 };
 
 #endif
